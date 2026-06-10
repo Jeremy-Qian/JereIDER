@@ -1,0 +1,9 @@
+[package]
+name = "gpui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+crossbeam-channel = "0.5"
+eframe = "0.31"
+muda = "0.19.2"
