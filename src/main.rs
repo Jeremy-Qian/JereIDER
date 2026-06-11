@@ -97,9 +97,8 @@ impl eframe::App for JereIDEApp {
                     .show(ui, |ui| {
                         ui.add_sized(
                             available,
-                            egui::TextEdit::multiline(&mut self.code_text)
+                            egui::TextEdit::code_editor(egui::TextEdit::multiline(&mut self.code_text))
                                 .id_source("editor")
-                                .font(egui::TextStyle::Monospace)
                                 .frame(false)
                                 .margin(5)
                                 .text_color(egui::Color32::BLACK),
