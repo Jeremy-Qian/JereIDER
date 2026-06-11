@@ -17,11 +17,11 @@ fn main() -> Result<(), eframe::Error> {
     eframe::run_native(
         "JereIDE",
         options,
-        Box::new(|_cc| Ok(Box::new(EditorApp::new(app_menu)))),
+        Box::new(|_cc| Ok(Box::new(JereIDEApp::new(app_menu)))),
     )
 }
 
-struct EditorApp {
+struct JereIDEApp {
     code_text: String,
     editor_focused: bool,
     cursor_line: usize,
@@ -30,7 +30,7 @@ struct EditorApp {
     editor_id: egui::Id,
 }
 
-impl EditorApp {
+impl JereIDEApp {
     fn new(app_menu: AppMenu) -> Self {
         Self {
             code_text: String::new(),
@@ -43,7 +43,7 @@ impl EditorApp {
     }
 }
 
-impl eframe::App for EditorApp {
+impl eframe::App for JereIDEApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         if !self.app_menu.is_initialized() {
             self.app_menu.init();
@@ -126,7 +126,7 @@ impl eframe::App for EditorApp {
     }
 }
 
-impl EditorApp {
+impl JereIDEApp {
     fn handle_edit_action(&mut self, ctx: &egui::Context, action: &str) {
         match action {
             "select_all" => self.action_select_all(ctx),
