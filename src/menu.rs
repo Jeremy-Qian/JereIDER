@@ -11,10 +11,10 @@ pub struct AppMenu {
 impl AppMenu {
     pub fn new() -> Self {
         // First submenu becomes the macOS application menu (named "GPUI").
-        let app_menu = Submenu::with_id("gpui", "GPUI", true);
+        let app_menu = Submenu::with_id("gpui", "JereIDE", true);
         app_menu
             .append_items(&[
-                &MenuItem::with_id("about", "About GPUI", true, None),
+                &MenuItem::with_id("about", "About JereIDE", true, None),
                 &PredefinedMenuItem::separator(),
                 &MenuItem::with_id(
                     "quit",
@@ -63,6 +63,25 @@ impl AppMenu {
                     "Redo",
                     true,
                     Some("Cmd+Shift+Z".parse::<Accelerator>().unwrap()),
+                ),
+                &PredefinedMenuItem::separator(),
+                &MenuItem::with_id(
+                    "cut",
+                    "Cut",
+                    true,
+                    Some("Cmd+X".parse::<Accelerator>().unwrap()),
+                ),
+                &MenuItem::with_id(
+                    "copy",
+                    "Copy",
+                    true,
+                    Some("Cmd+C".parse::<Accelerator>().unwrap()),
+                ),
+                &MenuItem::with_id(
+                    "paste",
+                    "Paste",
+                    true,
+                    Some("Cmd+V".parse::<Accelerator>().unwrap()),
                 ),
                 &PredefinedMenuItem::separator(),
                 &MenuItem::with_id(
