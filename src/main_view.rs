@@ -1,4 +1,5 @@
 use eframe::egui;
+use crate::syntax::SyntaxHighlighter;
 use crate::JereIDEApp;
 
 impl JereIDEApp {
@@ -19,6 +20,13 @@ impl JereIDEApp {
                     s
                 };
 
+                let highlighter = SyntaxHighlighter::new(14.0);
+
+                let mut layouter = |ui: &egui::Ui, text: &str, _max_width: f32| {
+                    let layout_job = highlighter.highlight(text);
+                    ui.fonts(|f| f.layout_job(layout_job))
+                };
+
                 let output = egui::ScrollArea::vertical()
                     .auto_shrink(false)
                     .show(ui, |ui| {
@@ -28,7 +36,7 @@ impl JereIDEApp {
                                 .id_source("editor")
                                 .frame(false)
                                 .margin(5)
-                                .text_color(egui::Color32::BLACK),
+                                .layouter(&mut layouter),
                         )
                     });
 

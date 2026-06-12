@@ -3,6 +3,7 @@ use eframe::egui;
 mod menu;
 mod main_view;
 mod status_bar;
+mod syntax;
 mod text_editor;
 
 use menu::AppMenu;
