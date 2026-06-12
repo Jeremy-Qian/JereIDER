@@ -139,7 +139,15 @@ impl SyntaxHighlighter {
                         if let Some(fmt) = fmt {
                             let byte_start = byte_offset(text, word_start);
                             let byte_end = byte_offset(text, i);
-                            sections.push((byte_start, byte_end, fmt));
+                            sections.push((byte_start, byte_end, fmt.clone()));
+
+                            // If this is a macro (followed by !), also consume and highlight the !
+                            if i < len && chars[i] == '!' {
+                                let bang_start = byte_end;
+                                i += 1;
+                                let bang_end = byte_offset(text, i);
+                                sections.push((bang_start, bang_end, fmt));
+                            }
                         }
                         continue;
                     }
@@ -366,6 +374,14 @@ impl SyntaxHighlighter {
             return Some(TextFormat::simple(
                 self.font_id.clone(),
                 Color32::from_rgb(0, 128, 192),
+            ));
+        }
+
+        // Check if followed by `!` → macro invocation
+        if pos < chars.len() && chars[pos] == '!' {
+            return Some(TextFormat::simple(
+                self.font_id.clone(),
+                Color32::from_rgb(180, 80, 180),
             ));
         }
 
