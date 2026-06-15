@@ -1,0 +1,48 @@
+//! macOS window control utilities – positions the traffic light buttons
+//! (close / minimize / zoom) when the title bar is hidden.
+
+#[cfg(target_os = "macos")]
+pub fn position_traffic_lights(frame: &eframe::Frame, offset_y: f64) {
+    use objc2::msg_send;
+    use objc2::runtime::AnyObject;
+    use objc2_foundation::{NSPoint, NSRect};
+    use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+
+    let Ok(handle) = frame.window_handle() else {
+        return;
+    };
+    let RawWindowHandle::AppKit(appkit) = handle.as_raw() else {
+        return;
+    };
+
+    let ns_view = appkit.ns_view.as_ptr() as *mut AnyObject;
+
+    unsafe {
+        // Get the NSWindow from the NSView
+        let ns_window: *mut AnyObject = msg_send![ns_view, window];
+        if ns_window.is_null() {
+            return;
+        }
+
+        // NSWindowButton constants: Close=0, Miniaturize=1, Zoom=2
+        for tag in 0i64..3 {
+            let button: *mut AnyObject = msg_send![ns_window, standardWindowButton: tag];
+            if button.is_null() {
+                continue;
+            }
+
+            // Read current frame
+            let frame: NSRect = msg_send![button, frame];
+
+            // Shift the button down by `offset_y`
+            let new_frame = NSRect {
+                origin: NSPoint {
+                    x: frame.origin.x,
+                    y: frame.origin.y + offset_y,
+                },
+                size: frame.size,
+            };
+            let _: () = msg_send![button, setFrame: new_frame];
+        }
+    }
+}

@@ -22,7 +22,7 @@ impl JereIDEApp {
 
 
                 // Gray container above the editor
-                let gray_bar_height = 32.0;
+                let gray_bar_height = 34.0;
                 let (rect, _) = ui.allocate_exact_size(
                     egui::vec2(available.x, gray_bar_height),
                     egui::Sense::hover(),

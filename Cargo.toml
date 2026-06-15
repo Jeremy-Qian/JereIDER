@@ -8,3 +8,8 @@ arboard = "3.6.1"
 crossbeam-channel = "0.5"
 eframe = "0.31"
 muda = "0.19.2"
+
+[target.'cfg(any(target_os = "macos"))'.dependencies]
+objc2 = "0.5"
+objc2-foundation = "0.2"
+raw-window-handle = "0.6"
