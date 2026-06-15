@@ -40,6 +40,7 @@ struct JereIDEApp {
     editor_id: egui::Id,
     current_view: CurrentView,
     traffic_lights_positioned: bool,
+    was_fullscreen: bool,
 }
 
 impl JereIDEApp {
@@ -53,6 +54,7 @@ impl JereIDEApp {
             editor_id: egui::Id::new("editor"),
             current_view: CurrentView::Code,
             traffic_lights_positioned: false,
+            was_fullscreen: false,
         }
     }
 }
@@ -60,9 +62,13 @@ impl JereIDEApp {
 impl eframe::App for JereIDEApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         #[cfg(target_os = "macos")]
-        if !self.traffic_lights_positioned {
-            window_controls::position_traffic_lights(frame, 2.0, -3.0);
-            self.traffic_lights_positioned = true;
+        {
+            let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
+            if self.was_fullscreen != is_fullscreen || !self.traffic_lights_positioned {
+                window_controls::position_traffic_lights(frame, 2.0, -3.0);
+                self.traffic_lights_positioned = true;
+            }
+            self.was_fullscreen = is_fullscreen;
         }
 
         if !self.app_menu.is_initialized() {
