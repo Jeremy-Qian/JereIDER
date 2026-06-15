@@ -14,7 +14,9 @@ fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([800.0, 600.0])
-            .with_title("JereIDE"),
+            .with_titlebar_shown(false)
+            .with_title_shown(false)
+            .with_fullsize_content_view(true),
         ..Default::default()
     };
 
