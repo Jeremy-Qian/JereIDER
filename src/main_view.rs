@@ -1,6 +1,6 @@
 use eframe::egui;
 use crate::syntax::SyntaxHighlighter;
-use crate::JereIDEApp;
+use crate::{CurrentView, JereIDEApp};
 
 impl JereIDEApp {
     pub fn render_central_panel(&mut self, ctx: &egui::Context) {
@@ -20,6 +20,30 @@ impl JereIDEApp {
                     s
                 };
 
+
+                // Gray container above the editor
+                let gray_bar_height = 32.0;
+                let (rect, _) = ui.allocate_exact_size(
+                    egui::vec2(available.x, gray_bar_height),
+                    egui::Sense::hover(),
+                );
+                ui.painter().rect_filled(rect, 0.0, egui::Color32::from_rgb(245, 245, 245));
+                ui.allocate_new_ui(egui::UiBuilder::new().max_rect(rect), |ui| {
+                    ui.style_mut().text_styles.insert(egui::TextStyle::Button, egui::FontId::proportional(16.0));
+
+                    ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+                        ui.add_space(5.0);
+                        ui.selectable_value(&mut self.current_view, CurrentView::Code, "Code");
+                        ui.selectable_value(&mut self.current_view, CurrentView::Command, "Command");
+                    });
+                });
+
+
+
+
+
+
+
                 let highlighter = SyntaxHighlighter::new(14.0);
 
                 let mut layouter = |ui: &egui::Ui, text: &str, _max_width: f32| {
@@ -27,11 +51,13 @@ impl JereIDEApp {
                     ui.fonts(|f| f.layout_job(layout_job))
                 };
 
+                let editor_available = ui.available_size();
+
                 let output = egui::ScrollArea::vertical()
                     .auto_shrink(false)
                     .show(ui, |ui| {
                         ui.add_sized(
-                            available,
+                            editor_available,
                             egui::TextEdit::code_editor(egui::TextEdit::multiline(&mut self.code_text))
                                 .id_source("editor")
                                 .frame(false)

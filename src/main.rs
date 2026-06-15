@@ -24,6 +24,11 @@ fn main() -> Result<(), eframe::Error> {
         Box::new(|_cc| Ok(Box::new(JereIDEApp::new(app_menu)))),
     )
 }
+#[derive(PartialEq)]
+enum CurrentView {
+    Code,
+    Command,
+}
 
 struct JereIDEApp {
     code_text: String,
@@ -32,6 +37,7 @@ struct JereIDEApp {
     cursor_col: usize,
     app_menu: AppMenu,
     editor_id: egui::Id,
+    current_view: CurrentView,
 }
 
 impl JereIDEApp {
@@ -43,6 +49,7 @@ impl JereIDEApp {
             cursor_col: 1,
             app_menu,
             editor_id: egui::Id::new("editor"),
+            current_view: CurrentView::Code,
         }
     }
 }
