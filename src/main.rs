@@ -63,7 +63,7 @@ impl eframe::App for JereIDEApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         #[cfg(target_os = "macos")]
         if !self.traffic_lights_positioned {
-            window_controls::position_traffic_lights(frame, -3.0);
+            window_controls::position_traffic_lights(frame, 2.0, -3.0);
             self.traffic_lights_positioned = true;
         }
 

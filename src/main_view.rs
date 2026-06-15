@@ -22,6 +22,7 @@ impl JereIDEApp {
 
 
                 // Gray container above the editor
+                let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                 let gray_bar_height = 34.0;
                 let (rect, _) = ui.allocate_exact_size(
                     egui::vec2(available.x, gray_bar_height),
@@ -32,7 +33,11 @@ impl JereIDEApp {
                     ui.style_mut().text_styles.insert(egui::TextStyle::Button, egui::FontId::proportional(16.0));
 
                     ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
-                        ui.add_space(75.0); // For traffic lights
+                        if is_fullscreen {
+                            ui.add_space(7.0); // Margin
+                        } else {
+                            ui.add_space(75.0); // For traffic lights
+                        }
                         ui.selectable_value(&mut self.current_view, CurrentView::Code, "Code");
                         ui.selectable_value(&mut self.current_view, CurrentView::Command, "Command");
                     });

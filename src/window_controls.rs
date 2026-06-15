@@ -2,7 +2,7 @@
 //! (close / minimize / zoom) when the title bar is hidden.
 
 #[cfg(target_os = "macos")]
-pub fn position_traffic_lights(frame: &eframe::Frame, offset_y: f64) {
+pub fn position_traffic_lights(frame: &eframe::Frame, offset_x: f64, offset_y: f64) {
     use objc2::msg_send;
     use objc2::runtime::AnyObject;
     use objc2_foundation::{NSPoint, NSRect};
@@ -34,10 +34,10 @@ pub fn position_traffic_lights(frame: &eframe::Frame, offset_y: f64) {
             // Read current frame
             let frame: NSRect = msg_send![button, frame];
 
-            // Shift the button down by `offset_y`
+            // Shift the button by `offset_x` and `offset_y`
             let new_frame = NSRect {
                 origin: NSPoint {
-                    x: frame.origin.x,
+                    x: frame.origin.x + offset_x,
                     y: frame.origin.y + offset_y,
                 },
                 size: frame.size,
