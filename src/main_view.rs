@@ -30,11 +30,11 @@ impl JereIDEApp {
                 );
                 ui.painter().rect_filled(rect, 0.0, egui::Color32::from_rgb(245, 245, 245));
                 ui.allocate_new_ui(egui::UiBuilder::new().max_rect(rect), |ui| {
-                    ui.style_mut().text_styles.insert(egui::TextStyle::Button, egui::FontId::proportional(16.0));
+                    ui.style_mut().text_styles.insert(egui::TextStyle::Button, egui::FontId::proportional(12.0));
 
                     ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
                         if is_fullscreen {
-                            ui.add_space(7.0); // Margin
+                            ui.add_space(7.0); // Normal Space
                         } else {
                             ui.add_space(75.0); // For traffic lights
                         }
