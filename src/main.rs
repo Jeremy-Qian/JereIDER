@@ -1,10 +1,8 @@
 use eframe::egui;
 
+mod editor;
 mod menu;
-mod main_view;
-mod status_bar;
-mod syntax;
-mod text_editor;
+mod ui;
 mod window_controls;
 
 use menu::AppMenu;

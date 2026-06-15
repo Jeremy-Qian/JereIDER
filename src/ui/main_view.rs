@@ -1,14 +1,13 @@
 use eframe::egui;
-use crate::syntax::SyntaxHighlighter;
-use crate::{CurrentView, JereIDEApp};
+use crate::editor::cursor::char_index_to_line_col;
+use crate::editor::syntax::SyntaxHighlighter;
+use crate::JereIDEApp;
 
 impl JereIDEApp {
     pub fn render_central_panel(&mut self, ctx: &egui::Context) {
         egui::CentralPanel::default()
             .frame(egui::Frame::NONE.fill(egui::Color32::WHITE))
             .show(ctx, |ui| {
-                let available = ui.available_size();
-
                 let style = ui.style_mut();
                 style.visuals.extreme_bg_color = egui::Color32::WHITE;
                 style.visuals.widgets.inactive.bg_stroke = egui::Stroke::NONE;
@@ -20,34 +19,8 @@ impl JereIDEApp {
                     s
                 };
 
-
-                // Gray container above the editor
                 let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
-                let gray_bar_height = 34.0;
-                let (rect, _) = ui.allocate_exact_size(
-                    egui::vec2(available.x, gray_bar_height),
-                    egui::Sense::hover(),
-                );
-                ui.painter().rect_filled(rect, 0.0, egui::Color32::from_rgb(245, 245, 245));
-                ui.allocate_new_ui(egui::UiBuilder::new().max_rect(rect), |ui| {
-                    ui.style_mut().text_styles.insert(egui::TextStyle::Button, egui::FontId::proportional(12.0));
-
-                    ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
-                        if is_fullscreen {
-                            ui.add_space(7.0); // Normal Space
-                        } else {
-                            ui.add_space(75.0); // For traffic lights
-                        }
-                        ui.selectable_value(&mut self.current_view, CurrentView::Code, "Code");
-                        ui.selectable_value(&mut self.current_view, CurrentView::Command, "Command");
-                    });
-                });
-
-
-
-
-
-
+                self.render_title_bar(ui, is_fullscreen);
 
                 let highlighter = SyntaxHighlighter::new(14.0);
 
@@ -89,21 +62,4 @@ impl JereIDEApp {
                 }
             });
     }
-}
-
-fn char_index_to_line_col(text: &str, char_index: usize) -> (usize, usize) {
-    let mut line = 0;
-    let mut col = 0;
-    for (ci, ch) in text.chars().enumerate() {
-        if ci >= char_index {
-            break;
-        }
-        if ch == '\n' {
-            line += 1;
-            col = 0;
-        } else {
-            col += 1;
-        }
-    }
-    (line, col)
 }
