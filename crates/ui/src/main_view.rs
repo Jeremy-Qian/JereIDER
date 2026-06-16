@@ -31,7 +31,7 @@ pub fn render_central_panel(state: &mut AppState, ctx: &egui::Context) {
 
             let editor_available = ui.available_size();
 
-            let output = egui::ScrollArea::vertical()
+            let output = egui::ScrollArea::both()
                 .auto_shrink(false)
                 .show(ui, |ui| {
                     ui.add_sized(
