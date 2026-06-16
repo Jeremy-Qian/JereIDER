@@ -4,10 +4,11 @@ use jereide_syntax::SyntaxHighlighter;
 
 use crate::title_bar;
 
-pub fn render_central_panel(state: &mut AppState, ctx: &egui::Context) {
+pub fn render_central_panel(state: &mut AppState, ui: &mut egui::Ui) {
+    let ctx = ui.ctx().clone();
     egui::CentralPanel::default()
-        .frame(egui::Frame::NONE.fill(egui::Color32::WHITE))
-        .show(ctx, |ui| {
+            .frame(egui::Frame::NONE.fill(egui::Color32::WHITE))
+            .show_inside(ui, |ui| {
             let style = ui.style_mut();
             style.visuals.extreme_bg_color = egui::Color32::WHITE;
             style.visuals.widgets.inactive.bg_stroke = egui::Stroke::NONE;
@@ -24,10 +25,10 @@ pub fn render_central_panel(state: &mut AppState, ctx: &egui::Context) {
 
             let highlighter = SyntaxHighlighter::new(14.0);
 
-            let mut layouter = |ui: &egui::Ui, text: &str, _max_width: f32| {
-                let layout_job = highlighter.highlight(text);
-                ui.fonts(|f| f.layout_job(layout_job))
-            };
+            let mut layouter = |ui: &egui::Ui, text: &dyn egui::widgets::TextBuffer, _max_width: f32| {
+                            let layout_job = highlighter.highlight(text.as_str());
+                            ui.fonts_mut(|f| f.layout_job(layout_job))
+                        };
 
             let editor_available = ui.available_size();
 
@@ -38,8 +39,10 @@ pub fn render_central_panel(state: &mut AppState, ctx: &egui::Context) {
                         editor_available,
                         egui::TextEdit::code_editor(egui::TextEdit::multiline(&mut state.code_text))
                             .id_source("editor")
-                            .frame(false)
-                            .margin(5)
+                                                        .frame(egui::Frame {
+                                                            inner_margin: egui::Margin::same(10),
+                                                            ..egui::Frame::NONE
+                                                        })
                             .layouter(&mut layouter),
                     )
                 });
@@ -47,7 +50,7 @@ pub fn render_central_panel(state: &mut AppState, ctx: &egui::Context) {
             let response = output.inner;
             state.editor_id = response.id;
 
-            if let Some(edit_state) = egui::TextEdit::load_state(ctx, response.id) {
+            if let Some(edit_state) = egui::TextEdit::load_state(&ctx, response.id) {
                 if let Some(range) = edit_state.cursor.char_range() {
                     let (line, col) =
                         char_index_to_line_col(&state.code_text, range.primary.index);

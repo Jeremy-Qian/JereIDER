@@ -17,7 +17,8 @@ impl JereIDEApp {
 }
 
 impl eframe::App for JereIDEApp {
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
+        let ctx = ui.ctx();
         #[cfg(target_os = "macos")]
         {
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
@@ -46,8 +47,8 @@ impl eframe::App for JereIDEApp {
             }
         }
 
-        jereide_ui::status_bar::render_status_bar(&self.state, ctx);
-        jereide_ui::main_view::render_central_panel(&mut self.state, ctx);
+        jereide_ui::status_bar::render_status_bar(&self.state, ui);
+        jereide_ui::main_view::render_central_panel(&mut self.state, ui);
     }
 }
 
