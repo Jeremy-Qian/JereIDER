@@ -1,0 +1,32 @@
+use eframe::egui;
+use jereide_core::{AppState, CurrentView};
+
+pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: bool) {
+    let available = ui.available_size();
+    let gray_bar_height = 34.0;
+    let (rect, _) = ui.allocate_exact_size(
+        egui::vec2(available.x, gray_bar_height),
+        egui::Sense::hover(),
+    );
+    ui.painter().rect_filled(rect, 0.0, egui::Color32::from_rgb(245, 245, 245));
+    ui.allocate_new_ui(egui::UiBuilder::new().max_rect(rect), |ui| {
+        ui.style_mut().text_styles.insert(
+            egui::TextStyle::Button,
+            egui::FontId::proportional(12.0),
+        );
+
+        ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+            if is_fullscreen {
+                ui.add_space(7.0);
+            } else {
+                ui.add_space(75.0); // For traffic lights
+            }
+            ui.selectable_value(&mut state.current_view, CurrentView::Code, "Code");
+            ui.selectable_value(
+                &mut state.current_view,
+                CurrentView::Command,
+                "Command",
+            );
+        });
+    });
+}

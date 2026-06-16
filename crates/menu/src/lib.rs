@@ -10,18 +10,19 @@ pub struct AppMenu {
 
 impl AppMenu {
     pub fn new() -> Self {
-        // First submenu becomes the macOS application menu (named "GPUI").
-        let app_menu = Submenu::with_id("gpui", "JereIDE", true);
+        // First submenu becomes the macOS application menu (named "jereide").
+        let app_menu = Submenu::with_id("gpui", "jereide", true);
         app_menu
             .append_items(&[
-                &MenuItem::with_id("about", "About JereIDE", true, None),
+                &PredefinedMenuItem::about(None, None),
                 &PredefinedMenuItem::separator(),
-                &MenuItem::with_id(
-                    "quit",
-                    "Quit",
-                    true,
-                    Some("Cmd+Q".parse::<Accelerator>().unwrap()),
-                ),
+                &PredefinedMenuItem::services(None),
+                &PredefinedMenuItem::separator(),
+                &PredefinedMenuItem::hide(None),
+                &PredefinedMenuItem::hide_others(None),
+                &PredefinedMenuItem::show_all(None),
+                &PredefinedMenuItem::separator(),
+                &PredefinedMenuItem::quit(None),
             ])
             .ok();
 
@@ -93,10 +94,16 @@ impl AppMenu {
             ])
             .ok();
 
+        let view_menu = Submenu::with_id("view", "View", true);
+        view_menu
+            .append_items(&[&PredefinedMenuItem::fullscreen(None)])
+            .ok();
+
         let menu = Menu::new();
         menu.append(&app_menu).ok();
         menu.append(&file_menu).ok();
         menu.append(&edit_menu).ok();
+        menu.append(&view_menu).ok();
 
         let receiver = MenuEvent::receiver();
         Self {

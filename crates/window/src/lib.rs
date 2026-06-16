@@ -1,6 +1,7 @@
 //! macOS window control utilities – positions the traffic light buttons
 //! (close / minimize / zoom) when the title bar is hidden.
 
+/// Positions the macOS traffic light buttons when running with a hidden title bar.
 #[cfg(target_os = "macos")]
 pub fn position_traffic_lights(frame: &eframe::Frame, offset_x: f64, offset_y: f64) {
     use objc2::msg_send;

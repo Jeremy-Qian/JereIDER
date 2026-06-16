@@ -1,0 +1,12 @@
+[package]
+name = "jereide-window"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+eframe = "0.31"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.5"
+objc2-foundation = "0.2"
+raw-window-handle = "0.6"

@@ -13,5 +13,5 @@ pub fn char_index_to_line_col(text: &str, char_index: usize) -> (usize, usize) {
             col += 1;
         }
     }
-    (line, col)
+    (line + 1, col + 1)
 }
