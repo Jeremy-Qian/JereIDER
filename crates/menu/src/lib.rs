@@ -15,6 +15,12 @@ impl AppMenu {
         app_menu
             .append_items(&[
                 &PredefinedMenuItem::about(None, None),
+                &MenuItem::with_id(
+                    "githubstar",
+                    "Star on GitHub",
+                    true,
+                    None,
+                ),
                 &PredefinedMenuItem::separator(),
                 &PredefinedMenuItem::services(None),
                 &PredefinedMenuItem::separator(),

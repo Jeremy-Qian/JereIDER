@@ -2,12 +2,12 @@ use eframe::egui;
 use jereide_core::AppState;
 use jereide_menu::AppMenu;
 
-struct jereideApp {
+struct JereIDEApp {
     state: AppState,
     app_menu: AppMenu,
 }
 
-impl jereideApp {
+impl JereIDEApp {
     fn new(app_menu: AppMenu) -> Self {
         Self {
             state: AppState::new(),
@@ -16,7 +16,7 @@ impl jereideApp {
     }
 }
 
-impl eframe::App for jereideApp {
+impl eframe::App for JereIDEApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         #[cfg(target_os = "macos")]
         {
@@ -66,6 +66,6 @@ fn main() -> Result<(), eframe::Error> {
     eframe::run_native(
         "jereide",
         options,
-        Box::new(|_cc| Ok(Box::new(jereideApp::new(app_menu)))),
+        Box::new(|_cc| Ok(Box::new(JereIDEApp::new(app_menu)))),
     )
 }

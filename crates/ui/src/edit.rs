@@ -9,6 +9,7 @@ pub fn handle_edit_action(state: &mut AppState, ctx: &egui::Context, action: &st
         "paste" | "Paste" | "503" => action_paste(state, ctx),
         "undo" | "Undo" | "504" => action_undo(state, ctx),
         "redo" | "Redo" | "505" => action_redo(state, ctx),
+        "githubstar" | "Star on GitHub" => action_github_star(state, ctx),
         _ => {
             eprintln!("Unknown edit action: '{}'", action);
         }
@@ -122,4 +123,12 @@ fn action_redo(state: &mut AppState, ctx: &egui::Context) {
             edit_state.store(ctx, state.editor_id);
         }
     }
+}
+
+fn action_github_star(state: &AppState, ctx: &egui::Context) {
+    // Open the GitHub repository in the default browser
+    ctx.open_url(egui::OpenUrl {
+        url: String::from("https://github.com/jeremy-qian/jereide"),
+        new_tab: true,
+    });
 }
