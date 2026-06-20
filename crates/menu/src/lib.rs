@@ -11,7 +11,7 @@ pub struct AppMenu {
 impl AppMenu {
     pub fn new() -> Self {
         // First submenu becomes the macOS application menu (named "jereide").
-        let app_menu = Submenu::with_id("gpui", "jereide", true);
+        let app_menu = Submenu::with_id("jereide", "jereide", true);
         app_menu
             .append_items(&[
                 &PredefinedMenuItem::about(None, None),
