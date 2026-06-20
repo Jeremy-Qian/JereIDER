@@ -1,10 +1,10 @@
 [package]
-name = "jereide-main"
+name = "JereIDE"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "jereide"
+name = "jereide_main"
 path = "src/lib.rs"
 
 [[bin]]

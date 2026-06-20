@@ -3,6 +3,19 @@
 version = 4
 
 [[package]]
+name = "JereIDE"
+version = "0.1.0"
+dependencies = [
+ "eframe",
+ "jereide-code",
+ "jereide-command",
+ "jereide-core",
+ "jereide-menu",
+ "jereide-ui",
+ "jereide-window",
+]
+
+[[package]]
 name = "ab_glyph"
 version = "0.2.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1872,19 +1885,6 @@ name = "jereide-core"
 version = "0.1.0"
 dependencies = [
  "eframe",
-]
-
-[[package]]
-name = "jereide-main"
-version = "0.1.0"
-dependencies = [
- "eframe",
- "jereide-code",
- "jereide-command",
- "jereide-core",
- "jereide-menu",
- "jereide-ui",
- "jereide-window",
 ]
 
 [[package]]
