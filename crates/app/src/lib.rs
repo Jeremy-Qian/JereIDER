@@ -72,6 +72,7 @@ impl eframe::App for JereIDEApp {
             .show_inside(ui, |ui| {
                 let style = ui.style_mut();
                 style.visuals.extreme_bg_color = egui::Color32::WHITE;
+                style.spacing.item_spacing.y = 0.0;
 
                 let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                 jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
