@@ -126,7 +126,6 @@ fn action_redo(state: &mut AppState, ctx: &egui::Context) {
 }
 
 fn action_github_star(_state: &AppState, ctx: &egui::Context) {
-    // Open the GitHub repository in the default browser
     ctx.open_url(egui::OpenUrl {
         url: String::from("https://github.com/jeremy-qian/jereide"),
         new_tab: true,

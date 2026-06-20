@@ -21,12 +21,19 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
             } else {
                 ui.add_space(75.0); // For traffic lights
             }
-            ui.selectable_value(&mut state.current_view, CurrentView::Code, "Code");
-            ui.selectable_value(
-                &mut state.current_view,
-                CurrentView::Command,
-                "Command",
-            );
+
+            if ui
+                .selectable_label(state.current_view == CurrentView::Code, "Code")
+                .clicked()
+            {
+                state.slide_to_view(CurrentView::Code);
+            }
+            if ui
+                .selectable_label(state.current_view == CurrentView::Command, "Command")
+                .clicked()
+            {
+                state.slide_to_view(CurrentView::Command);
+            }
         });
     });
 }

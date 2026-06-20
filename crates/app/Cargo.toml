@@ -1,7 +1,15 @@
 [package]
-name = "JereIDE"
+name = "jereide-main"
 version = "0.1.0"
 edition = "2021"
+
+[lib]
+name = "jereide"
+path = "src/lib.rs"
+
+[[bin]]
+name = "JereIDE"
+path = "src/main.rs"
 
 [dependencies]
 eframe = "0.34"
@@ -9,3 +17,5 @@ jereide-core = { path = "../core" }
 jereide-menu = { path = "../menu" }
 jereide-window = { path = "../window" }
 jereide-ui = { path = "../ui" }
+jereide-code = { path = "../code" }
+jereide-command = { path = "../command" }
