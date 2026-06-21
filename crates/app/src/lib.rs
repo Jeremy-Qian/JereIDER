@@ -1,5 +1,5 @@
 use eframe::egui;
-use jereide_core::AppState;
+use jereide_core::{AppState, CurrentView};
 use jereide_menu::AppMenu;
 
 pub struct JereIDEApp {
@@ -19,21 +19,6 @@ impl JereIDEApp {
 impl eframe::App for JereIDEApp {
     fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         let ctx = ui.ctx().clone();
-
-        // --- Delta time for smooth animation ---
-        let now = ui.input(|i| i.time);
-        let dt = if let Some(last) = self.state.last_frame_time {
-            (now - last) as f32
-        } else {
-            0.0
-        };
-        self.state.last_frame_time = Some(now);
-
-        // --- Advance slide animation (300ms OutCubic) ---
-        if self.state.slide_t < 1.0 {
-            self.state.slide_t = (self.state.slide_t + dt / 0.3).min(1.0);
-            ctx.request_repaint();
-        }
 
         // --- macOS traffic lights ---
         #[cfg(target_os = "macos")]
@@ -66,9 +51,9 @@ impl eframe::App for JereIDEApp {
         }
 
         // --- Main UI ---
-        // Status bar must be on the top-level ui (not inside CentralPanel)
-        // so Panel::bottom can correctly reserve space from the global pass state.
         let state = &mut self.state;
+
+        // Status bar at the top level
         jereide_ui::status_bar::render_status_bar(state, ui);
 
         egui::CentralPanel::default()
@@ -81,25 +66,30 @@ impl eframe::App for JereIDEApp {
                 let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                 jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
 
-                // Sliding panel with Code view (page 0) and Command view (page 1)
-                let available = ui.available_size();
-                let viewport_width = available.x;
-                let offset = state.slide_offset(viewport_width);
-
-                jereide_ui::sliding_panel::render_sliding_panel(
-                    ui,
-                    2,
-                    offset,
-                    |ui, page_idx| {
-                        match page_idx {
-                            0 => jereide_code::code_view::render_code_view(state, ui),
-                            1 => {
-                                jereide_command::command_view::render_command_view(state, ui)
-                            }
-                            _ => {}
-                        }
-                    },
+                let content_rect = ui.available_rect_before_wrap();
+                let mut code_ui = ui.new_child(
+                    egui::UiBuilder::new()
+                        .max_rect(content_rect)
+                        .layout(egui::Layout::top_down(egui::Align::LEFT)),
                 );
+                jereide_code::code_view::render_code_view(state, &mut code_ui);
             });
+
+        // --- Command view overlay (instant, covers everything below the title bar) ---
+        if state.current_view == CurrentView::Command {
+            let title_bar_height = 34.0;
+            let full_area = ui.ctx().content_rect();
+            let overlay_rect = egui::Rect::from_min_size(
+                egui::pos2(full_area.left(), full_area.top() + title_bar_height),
+                egui::vec2(full_area.width(), full_area.height() - title_bar_height),
+            );
+
+            let mut overlay_ui = ui.new_child(
+                egui::UiBuilder::new()
+                    .max_rect(overlay_rect)
+                    .layout(egui::Layout::top_down(egui::Align::LEFT)),
+            );
+            jereide_command::command_view::render_command_view(state, &mut overlay_ui);
+        }
     }
 }

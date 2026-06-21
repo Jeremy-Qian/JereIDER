@@ -58,3 +58,4 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         response.request_focus();
     }
 }
+

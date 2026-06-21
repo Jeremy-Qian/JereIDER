@@ -26,13 +26,13 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
                 .selectable_label(state.current_view == CurrentView::Code, "Code")
                 .clicked()
             {
-                state.slide_to_view(CurrentView::Code);
+                state.switch_to_view(CurrentView::Code);
             }
             if ui
                 .selectable_label(state.current_view == CurrentView::Command, "Command")
                 .clicked()
             {
-                state.slide_to_view(CurrentView::Command);
+                state.switch_to_view(CurrentView::Command);
             }
         });
     });
