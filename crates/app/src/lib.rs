@@ -65,8 +65,12 @@ impl eframe::App for JereIDEApp {
             }
         }
 
-        // --- Main UI: title bar + sliding panel + status bar ---
+        // --- Main UI ---
+        // Status bar must be on the top-level ui (not inside CentralPanel)
+        // so Panel::bottom can correctly reserve space from the global pass state.
         let state = &mut self.state;
+        jereide_ui::status_bar::render_status_bar(state, ui);
+
         egui::CentralPanel::default()
             .frame(egui::Frame::NONE.fill(egui::Color32::WHITE))
             .show_inside(ui, |ui| {
@@ -93,11 +97,9 @@ impl eframe::App for JereIDEApp {
                                 jereide_command::command_view::render_command_view(state, ui)
                             }
                             _ => {}
-						}
+                        }
                     },
                 );
-
-                jereide_ui::status_bar::render_status_bar(state, ui);
             });
     }
 }
