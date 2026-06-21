@@ -25,13 +25,10 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             ui.fonts_mut(|f| f.layout_job(layout_job))
         };
 
-    let editor_available = ui.available_size();
-
-    let output = egui::ScrollArea::both()
+    let response = egui::ScrollArea::both()
         .auto_shrink(false)
         .show(ui, |ui| {
-            ui.add_sized(
-                editor_available,
+            ui.add(
                 egui::TextEdit::code_editor(egui::TextEdit::multiline(&mut state.code_text))
                     .id_source("editor")
                     .frame(egui::Frame {
@@ -40,9 +37,8 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     })
                     .layouter(&mut layouter),
             )
-        });
-
-    let response = output.inner;
+        })
+        .inner;
     state.editor_id = response.id;
 
     if let Some(edit_state) = egui::TextEdit::load_state(&ctx, response.id) {
