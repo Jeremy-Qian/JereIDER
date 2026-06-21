@@ -93,7 +93,7 @@ impl eframe::App for JereIDEApp {
                                 jereide_command::command_view::render_command_view(state, ui)
                             }
                             _ => {}
-                        }
+						}
                     },
                 );
 
