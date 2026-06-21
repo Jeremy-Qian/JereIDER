@@ -1,10 +1,12 @@
 use eframe::egui;
 use jereide_core::{AppState, CurrentView};
+use jereide_fs::FileManager;
 use jereide_menu::AppMenu;
 
 pub struct JereIDEApp {
     state: AppState,
     app_menu: AppMenu,
+    file_manager: FileManager,
 }
 
 impl JereIDEApp {
@@ -12,6 +14,44 @@ impl JereIDEApp {
         Self {
             state: AppState::new(),
             app_menu,
+            file_manager: FileManager::new(),
+        }
+    }
+
+    fn handle_new(&mut self) {
+        self.state.code_text.clear();
+        self.state.current_file_path = None;
+        self.file_manager.current_path = None;
+    }
+
+    fn handle_open(&mut self) {
+        if let Some((content, path)) = FileManager::open_file_dialog() {
+            self.state.code_text = content;
+            self.state.current_file_path = Some(path.display().to_string());
+            self.file_manager.current_path = Some(path);
+        }
+    }
+
+    fn handle_save(&mut self) {
+        let path = self.file_manager.current_path.clone();
+        match path {
+            Some(p) => {
+                if let Err(e) = FileManager::save_to_path(&self.state.code_text, &p) {
+                    eprintln!("Failed to save file: {}", e);
+                }
+            }
+            None => self.handle_save_as(),
+        }
+    }
+
+    fn handle_save_as(&mut self) {
+        if let Some(path) = FileManager::save_as_dialog() {
+            if let Err(e) = FileManager::save_to_path(&self.state.code_text, &path) {
+                eprintln!("Failed to save file: {}", e);
+            } else {
+                self.state.current_file_path = Some(path.display().to_string());
+                self.file_manager.current_path = Some(path);
+            }
         }
     }
 }
@@ -39,13 +79,17 @@ impl eframe::App for JereIDEApp {
 
         for event_id in self.app_menu.poll_events() {
             match event_id.as_ref() {
-                "new" | "open" | "save" => {}
+                "new" => self.handle_new(),
+                "open" => self.handle_open(),
+                "save" => self.handle_save(),
+                "save_as" => self.handle_save_as(),
                 "quit" => std::process::exit(0),
                 "about" => {}
                 "fullscreen" => {
                     let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                     ctx.send_viewport_cmd(egui::ViewportCommand::Fullscreen(!is_fullscreen));
                 }
+                "save_all" => {}
                 _ => jereide_code::edit::handle_edit_action(&mut self.state, &ctx, event_id.as_ref()),
             }
         }

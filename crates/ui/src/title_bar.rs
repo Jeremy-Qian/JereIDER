@@ -43,6 +43,22 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
             {
                 state.switch_to_view(CurrentView::Command);
             }
+
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                ui.add_space(10.0);
+                let file_label = state
+                    .current_file_path
+                    .as_ref()
+                    .and_then(|p| std::path::Path::new(p).file_name())
+                    .and_then(|n| n.to_str())
+                    .unwrap_or("Untitled")
+                    .to_string();
+                ui.label(
+                    egui::RichText::new(file_label)
+                        .color(egui::Color32::from_rgb(80, 80, 80))
+                        .size(12.0),
+                );
+            });
         });
     });
 }

@@ -8,6 +8,7 @@ pub enum CurrentView {
 
 pub struct AppState {
     pub code_text: String,
+    pub current_file_path: Option<String>,
     pub editor_focused: bool,
     pub cursor_line: usize,
     pub cursor_col: usize,
@@ -21,6 +22,7 @@ impl AppState {
     pub fn new() -> Self {
         Self {
             code_text: String::new(),
+            current_file_path: None,
             editor_focused: false,
             cursor_line: 1,
             cursor_col: 1,

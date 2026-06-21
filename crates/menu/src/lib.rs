@@ -53,6 +53,12 @@ impl AppMenu {
                     true,
                     Some("Cmd+S".parse::<Accelerator>().unwrap()),
                 ),
+                &MenuItem::with_id(
+                    "save_as",
+                    "Save As…",
+                    true,
+                    Some("Cmd+Shift+S".parse::<Accelerator>().unwrap()),
+                ),
             ])
             .ok();
 

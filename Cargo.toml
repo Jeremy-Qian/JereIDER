@@ -8,5 +8,6 @@ members = [
     "crates/ui",
     "crates/code",
     "crates/command",
+    "crates/fs",
 ]
 resolver = "2"
