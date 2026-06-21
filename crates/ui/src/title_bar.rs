@@ -21,6 +21,15 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
             } else {
                 ui.add_space(75.0); // For traffic lights
             }
+            let choose_project_resp = ui.button("Choose Project");
+            egui::Popup::menu(&choose_project_resp)
+                .gap(4.0)
+                .close_behavior(egui::PopupCloseBehavior::CloseOnClick)
+                .show(|ui| {
+                    ui.vertical(|ui| {
+                        ui.label("Needs Implementation");
+                    });
+                });
 
             if ui
                 .selectable_label(state.current_view == CurrentView::Code, "Code")
