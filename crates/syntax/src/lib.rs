@@ -23,10 +23,14 @@ pub struct SyntaxHighlighter {
 }
 
 impl SyntaxHighlighter {
-    pub fn new(font_size: f32) -> Self {
+    /// Create a new highlighter.
+    ///
+    /// `extension` is an optional file extension (e.g. `"rs"`, `"py"`).
+    /// If `None` or the extension is not recognised, falls back to plain text.
+    pub fn new(font_size: f32, extension: Option<&str>) -> Self {
         let ss = syntax_set();
-        let syntax = ss
-            .find_syntax_by_extension("rs")
+        let syntax = extension
+            .and_then(|ext| ss.find_syntax_by_extension(ext))
             .unwrap_or_else(|| ss.find_syntax_plain_text());
 
         let ts = theme_set();
