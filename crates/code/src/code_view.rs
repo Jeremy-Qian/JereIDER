@@ -95,15 +95,34 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
     let response = egui::ScrollArea::both()
         .auto_shrink(false)
         .show(ui, |ui| {
-            ui.add(
+            // Ensure the content area fills the viewport so clicks
+            // in empty space are still captured within the ScrollArea.
+            let viewport = ui.max_rect().size();
+            ui.set_min_size(viewport);
+
+            let text_response = ui.add(
                 egui::TextEdit::code_editor(egui::TextEdit::multiline(&mut state.code_text))
                     .id_source("editor")
+                    .desired_width(viewport.x)
                     .frame(egui::Frame {
                         inner_margin: egui::Margin::same(10),
                         ..egui::Frame::NONE
                     })
                     .layouter(&mut layouter),
-            )
+            );
+
+            // If there's empty space below the text (e.g. when the
+            // editor is empty or has few lines), make it clickable so
+            // clicking there focuses the editor.
+            let remaining = ui.available_size();
+            if remaining.y > 0.0 {
+                let (_, bg) = ui.allocate_exact_size(remaining, egui::Sense::click());
+                if bg.clicked() {
+                    text_response.request_focus();
+                }
+            }
+
+            text_response
         })
         .inner;
     state.editor_id = response.id;
