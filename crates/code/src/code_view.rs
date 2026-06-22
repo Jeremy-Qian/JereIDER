@@ -5,6 +5,7 @@ use eframe::egui;
 use jereide_core::{char_index_to_line_col, AppState};
 use jereide_syntax::SyntaxHighlighter;
 
+// A new thread for the syntax highlighting, I guess.
 thread_local! {
     static HIGHLIGHTER: RefCell<Option<SyntaxHighlighter>> = const { RefCell::new(None) };
     static PREV_EXTENSION: RefCell<Option<String>> = const { RefCell::new(None) };
@@ -14,6 +15,7 @@ thread_local! {
 
 const DIGIT_W: f32 = 8.0;
 
+// Pretty useless functions, but...
 fn visual_line_count(text: &str) -> usize {
     if text.is_empty() {
         1
@@ -31,6 +33,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
     let ctx = ui.ctx().clone();
 
     let style = ui.style_mut();
+    // TODO: Put constants somewhere else
     style.visuals.extreme_bg_color = egui::Color32::WHITE;
     style.visuals.widgets.inactive.bg_stroke = egui::Stroke::NONE;
     style.visuals.widgets.hovered.bg_stroke = egui::Stroke::NONE;
@@ -40,7 +43,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         s.bar_width = 12.0;
         s
     };
-
+    // Incremental Highlighting to make JereIDE faster
     let extension = state
         .current_file_path
         .as_ref()
@@ -68,7 +71,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             *hl.borrow_mut() = Some(SyntaxHighlighter::new(14.0, extension));
         }
     });
-
+    // TODO: Put constants somewhere else
     let font_id = egui::FontId::monospace(14.0);
     let row_height = ui.fonts_mut(|f| f.row_height(&font_id));
     let line_count = visual_line_count(&state.code_text);
@@ -94,7 +97,8 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
 
             galley
         };
-
+    // Scrolling both ways
+    // TODO: Add option for wrap instead of horizontal scroll
     let response = egui::ScrollArea::both()
         .auto_shrink(false)
         .show(ui, |ui| {
@@ -102,7 +106,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             ui.set_min_size(viewport);
 
             let widget_top = ui.cursor().min.y;
-
+            // Complicated painting
             if state.cursor_line > 0 && state.cursor_line <= line_count {
                 let y = CUR_GALLEY.with(|g| {
                     let inner_margin_top = 10.0;
@@ -118,9 +122,11 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                         widget_top + inner_margin_top + idx as f32 * row_height
                     }
                 });
+                // TODO: Put constants somewhere else
                 let hl_x = gutter_w + 2.0;
                 let hl_w = (viewport.x - gutter_w - 2.0).max(0.0);
                 let painter = ui.painter();
+                // Current Line Highlighting
                 painter.rect_filled(
                     egui::Rect::from_min_size(
                         egui::pos2(hl_x, y),
@@ -130,7 +136,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     egui::Color32::from_rgb(255, 255, 208),
                 );
             }
-
+            // The Code Editor(TextEdit::code_editor captures Tabs and keeps focus)
             let text_response = ui.add(
                 egui::TextEdit::code_editor(egui::TextEdit::multiline(&mut state.code_text))
                     .id_source("editor")
@@ -191,7 +197,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     }
                 });
             }
-
+            // Fill up the whole Y available space
             let remaining = ui.available_size();
             if remaining.y > 0.0 {
                 let (_, bg) = ui.allocate_exact_size(remaining, egui::Sense::click());
@@ -205,7 +211,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         })
         .inner;
     state.editor_id = response.id;
-
+    // For the status bar Line/Col indicator
     if let Some(edit_state) = egui::TextEdit::load_state(&ctx, response.id) {
         if let Some(range) = edit_state.cursor.char_range() {
             let (line, col) = char_index_to_line_col(&state.code_text, range.primary.index);
@@ -219,5 +225,3 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         response.request_focus();
     }
 }
-
-
