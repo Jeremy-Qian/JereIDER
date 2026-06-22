@@ -10,7 +10,6 @@ pub struct AppMenu {
 
 impl AppMenu {
     pub fn new() -> Self {
-        // First submenu becomes the macOS application menu (named "jereide").
         let app_menu = Submenu::with_id("jereide", "jereide", true);
         app_menu
             .append_items(&[
@@ -125,7 +124,6 @@ impl AppMenu {
         }
     }
 
-    /// Must be called on the main thread, after the window/event loop is ready.
     pub fn init(&self) {
         #[cfg(target_os = "macos")]
         self.menu.init_for_nsapp();

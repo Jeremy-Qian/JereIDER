@@ -1,6 +1,5 @@
 use eframe::egui;
 
-/// Renders the command palette / command view placeholder.
 pub fn render_command_view(ui: &mut egui::Ui) {
     let rect = ui.max_rect();
     ui.painter().rect_filled(rect, 0, egui::Color32::from_gray(20));

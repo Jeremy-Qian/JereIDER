@@ -1,4 +1,3 @@
-/// Convert a character index in a string to (line, column) coordinates.
 pub fn char_index_to_line_col(text: &str, char_index: usize) -> (usize, usize) {
     let mut line = 0;
     let mut col = 0;

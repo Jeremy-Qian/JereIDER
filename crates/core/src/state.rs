@@ -33,7 +33,6 @@ impl AppState {
         }
     }
 
-    /// Switch to a new view.
     pub fn switch_to_view(&mut self, target: CurrentView) {
         if target != self.current_view {
             self.current_view = target;

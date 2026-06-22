@@ -60,7 +60,6 @@ impl eframe::App for JereIDEApp {
     fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         let ctx = ui.ctx().clone();
 
-        // --- macOS traffic lights ---
         #[cfg(target_os = "macos")]
         {
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
@@ -71,7 +70,6 @@ impl eframe::App for JereIDEApp {
             self.state.was_fullscreen = is_fullscreen;
         }
 
-        // --- Menu init & event handling ---
         if !self.app_menu.is_initialized() {
             self.app_menu.init();
             self.app_menu.set_initialized();
@@ -92,10 +90,8 @@ impl eframe::App for JereIDEApp {
             }
         }
 
-        // --- Main UI ---
         let state = &mut self.state;
 
-        // Status bar at the top level
         jereide_ui::status_bar::render_status_bar(state, ui);
 
         egui::CentralPanel::default()
@@ -117,7 +113,6 @@ impl eframe::App for JereIDEApp {
                 jereide_code::code_view::render_code_view(state, &mut code_ui);
             });
 
-        // --- Command view overlay (instant, covers everything below the title bar) ---
         if state.current_view == CurrentView::Command {
             let title_bar_height = 34.0;
             let full_area = ui.ctx().content_rect();
