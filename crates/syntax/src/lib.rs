@@ -38,6 +38,9 @@ pub struct SyntaxHighlighter {
     syntax: &'static SyntaxReference,
     theme: &'static Theme,
     lines: Vec<CachedLine>,
+    /// The full text from the last `highlight()` call — enables a fast
+    /// byte-level comparison to short-circuit before any line splitting.
+    cached_text: String,
 }
 
 impl SyntaxHighlighter {
@@ -63,6 +66,7 @@ impl SyntaxHighlighter {
             syntax,
             theme,
             lines: Vec::new(),
+            cached_text: String::new(),
         }
     }
 
@@ -75,8 +79,18 @@ impl SyntaxHighlighter {
     pub fn highlight(&mut self, text: &str) -> egui::text::LayoutJob {
         if text.is_empty() {
             self.lines.clear();
+            self.cached_text.clear();
             return egui::text::LayoutJob::default();
         }
+
+        // Fast path: text is byte-identical to the last frame.
+        // Skip ALL tokenisation work — just rebuild the LayoutJob
+        // from the existing line cache.
+        if text == self.cached_text {
+            return self.build_job(text);
+        }
+
+        self.cached_text = text.to_string();
 
         let ss = syntax_set();
         let new_lines: Vec<&str> = LinesWithEndings::from(text).collect();
@@ -92,6 +106,9 @@ impl SyntaxHighlighter {
             .min(new_lines.len());
 
         // Cache hit — text hasn't changed at all
+        // (Shouldn't normally reach here because of the fast path above,
+        //  but keep as a safety net for the edge case where cached_text
+        //  somehow got out of sync.)
         if first_diff == self.lines.len() && self.lines.len() == new_lines.len() {
             return self.build_job(text);
         }
@@ -148,14 +165,20 @@ impl SyntaxHighlighter {
             // ── 5. Early-stop check ───────────────────────────────
             // If the state after this line matches the old cache at the same
             // position AND the remaining text is identical, reuse the rest.
-            let should_stop = rel_idx < old_remainder.len()
+            let should_stop = if rel_idx < old_remainder.len()
                 && hls == old_remainder[rel_idx].hl_state
                 && ps == old_remainder[rel_idx].parse_state
-                && new_lines[first_diff + rel_idx + 1..]
-                    == old_remainder[rel_idx + 1..]
+            {
+                let remaining_new = &new_lines[first_diff + rel_idx + 1..];
+                let remaining_old = &old_remainder[rel_idx + 1..];
+                remaining_new.len() == remaining_old.len()
+                    && remaining_new
                         .iter()
-                        .map(|c| c.content.as_str())
-                        .collect::<Vec<_>>();
+                        .zip(remaining_old.iter())
+                        .all(|(&n, o)| n == o.content)
+            } else {
+                false
+            };
 
             new_cache.push(cached_line);
 
