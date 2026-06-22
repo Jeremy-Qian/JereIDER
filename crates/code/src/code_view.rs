@@ -1,5 +1,4 @@
 use std::cell::RefCell;
-use std::sync::Arc;
 
 use eframe::egui;
 use jereide_core::{char_index_to_line_col, AppState};
@@ -12,7 +11,7 @@ thread_local! {
     static HIGHLIGHTER: RefCell<Option<SyntaxHighlighter>> = const { RefCell::new(None) };
     static PREV_EXTENSION: RefCell<Option<String>> = const { RefCell::new(None) };
     static CACHED_TEXT: RefCell<String> = const { RefCell::new(String::new()) };
-    static CACHED_GALLEY: RefCell<Option<Arc<egui::Galley>>> = const { RefCell::new(None) };
+    static CACHED_JOB: RefCell<Option<egui::text::LayoutJob>> = const { RefCell::new(None) };
 }
 
 /// Renders the code editor view — a syntax-highlighted multi-line text editor.
@@ -52,7 +51,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             *hl.borrow_mut() = Some(SyntaxHighlighter::new(14.0, extension));
         });
         CACHED_TEXT.with(|t| t.borrow_mut().clear());
-        CACHED_GALLEY.with(|g| *g.borrow_mut() = None);
+        CACHED_JOB.with(|j| *j.borrow_mut() = None);
     }
 
     // ── Initialise highlighter on first frame ──
@@ -62,34 +61,40 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         }
     });
 
-    // ── Layouter with Galley-level caching ──
-    // On cache hit we return the same Arc<Galley>, letting egui skip
-    // text shaping entirely.  Only when the text actually changes do we
-    // call highlight() and fonts_mut().layout_job().
+    // ── Layouter ──
+    // Builds a LayoutJob from the incremental highlighter.
+    // We always produce a fresh Galley via fonts_mut() so cursor
+    // positioning stays in sync with the widget size — but we skip
+    // the (expensive) highlight() call when the text hasn't changed.
     let mut layouter =
-        |ui: &egui::Ui, text: &dyn egui::widgets::TextBuffer, _max_width: f32| {
+        |ui: &egui::Ui, text: &dyn egui::widgets::TextBuffer, wrap_width: f32| {
             let text_str = text.as_str();
 
-            // Fast path: text unchanged → return cached Galley
-            if CACHED_TEXT.with(|t| t.borrow().as_str() == text_str) {
-                if let Some(galley) = CACHED_GALLEY.with(|g| g.borrow().clone()) {
-                    return galley;
-                }
-            }
+            // Fast path: text unchanged — reuse the cached LayoutJob.
+            // This avoids calling into syntect entirely.
+            let mut layout_job = if CACHED_TEXT.with(|t| t.borrow().as_str() == text_str) {
+                CACHED_JOB.with(|j| {
+                    j.borrow()
+                        .as_ref()
+                        .cloned()
+                        .unwrap_or_default()
+                })
+            } else {
+                let job = HIGHLIGHTER.with(|hl| {
+                    hl.borrow_mut()
+                        .as_mut()
+                        .expect("highlighter initialized")
+                        .highlight(text_str)
+                });
+                CACHED_TEXT.with(|t| *t.borrow_mut() = text_str.to_string());
+                CACHED_JOB.with(|j| *j.borrow_mut() = Some(job.clone()));
+                job
+            };
 
-            // Slow path: text changed — highlight and shape
-            let layout_job = HIGHLIGHTER.with(|hl| {
-                hl.borrow_mut()
-                    .as_mut()
-                    .expect("highlighter initialized")
-                    .highlight(text_str)
-            });
-            let galley = ui.fonts_mut(|f| f.layout_job(layout_job));
-
-            CACHED_TEXT.with(|t| *t.borrow_mut() = text_str.to_string());
-            CACHED_GALLEY.with(|g| *g.borrow_mut() = Some(galley.clone()));
-
-            galley
+            // Always set the wrap width so the galley matches the
+            // current widget allocation (critical for cursor hit-test).
+            layout_job.wrap.max_width = wrap_width;
+            ui.fonts_mut(|f| f.layout_job(layout_job))
         };
 
     let response = egui::ScrollArea::both()
