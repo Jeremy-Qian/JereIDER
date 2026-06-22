@@ -1,3 +1,5 @@
+
+/// Are these even used anymore?
 pub fn char_range_substring(text: &str, start_char: usize, end_char: usize) -> String {
     text.chars()
         .skip(start_char)

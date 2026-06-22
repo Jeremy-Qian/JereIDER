@@ -6,6 +6,7 @@ pub enum CurrentView {
     Command,
 }
 
+/// Includes the cursor line/col, the current code text, the focusing stuff, etc
 pub struct AppState {
     pub code_text: String,
     pub current_file_path: Option<String>,
@@ -18,6 +19,8 @@ pub struct AppState {
     pub was_fullscreen: bool,
 }
 
+
+/// Another new method.
 impl AppState {
     pub fn new() -> Self {
         Self {
