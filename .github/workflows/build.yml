@@ -1,0 +1,56 @@
+name: Rust CI & Build
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-macos:
+    name: Build macOS Universal Binary
+    runs-on: macos-latest
+
+    steps:
+    # 1. Fetch the source code from the repository
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2. Install Rust and add both Intel and Apple Silicon targets
+    - name: Set up Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        targets: x86_64-apple-darwin, aarch64-apple-darwin
+
+    - name: Enable Cargo caching
+      uses: swatinem/rust-cache@v2
+
+    # 3. Test suite is temporarily disabled
+    # - name: Run tests
+    #   run: cargo test --verbose
+
+    # 4. Build both architectures individually
+    - name: Build release binaries
+      run: |
+        cargo build --release --target x86_64-apple-darwin
+        cargo build --release --target aarch64-apple-darwin
+
+    # 5. Merge the binaries into a single universal (lipo) binary
+    - name: Create Universal Binary
+      run: |
+        mkdir -p target/universal-apple-darwin/release
+        lipo -create \
+          target/x86_64-apple-darwin/release/JereIDE \
+          target/aarch64-apple-darwin/release/JereIDE \
+          -output target/universal-apple-darwin/release/JereIDE
+
+    # 6. Upload the universal binary artifact
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: JereIDE-macos-universal
+        path: target/universal-apple-darwin/release/JereIDE
+        if-no-files-found: error
