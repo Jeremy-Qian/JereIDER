@@ -3,13 +3,13 @@ use jereide_core::{char_range_substring, delete_char_range, insert_at_char_index
 
 pub fn handle_edit_action(state: &mut AppState, ctx: &egui::Context, action: &str) {
     match action {
-        "select_all" | "select-all" | "500" => action_select_all(state, ctx),
-        "copy" | "Copy" | "501" => action_copy(state, ctx),
-        "cut" | "Cut" | "502" => action_cut(state, ctx),
-        "paste" | "Paste" | "503" => action_paste(state, ctx),
-        "undo" | "Undo" | "504" => action_undo(state, ctx),
-        "redo" | "Redo" | "505" => action_redo(state, ctx),
-        "githubstar" | "Star on GitHub" => action_github_star(state, ctx),
+        "select_all" => action_select_all(state, ctx),
+        "copy" => action_copy(state, ctx),
+        "cut" => action_cut(state, ctx),
+        "paste" => action_paste(state, ctx),
+        "undo" => action_undo(state, ctx),
+        "redo" => action_redo(state, ctx),
+        "githubstar" => action_github_star(state, ctx),
         _ => {
             eprintln!("Unknown edit action: '{}'", action);
         }
