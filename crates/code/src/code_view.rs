@@ -120,6 +120,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                 if bg.clicked() {
                     text_response.request_focus();
                 }
+                bg.on_hover_cursor(egui::CursorIcon::Text);
             }
 
             text_response
