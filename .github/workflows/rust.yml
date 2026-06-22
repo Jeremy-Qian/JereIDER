@@ -1,4 +1,4 @@
-name: Rust
+name: Rust CI & Build
 
 on:
   push:
@@ -10,18 +10,35 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  test-and-build:
+    name: Test and Build Rust Binary
+    runs-on: macos-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-      
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run tests
-        run: cargo test --verbose
+    # 1. Fetch the source code from the repository
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2. Set up the stable Rust toolchain and cache dependencies
+    - name: Set up Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Enable Cargo caching
+      uses: swatinem/rust-cache@v2
+
+    # 3. Run your project test suite
+    - name: Run tests
+      run: cargo test --verbose
+
+    # 4. Compile the release binary optimized for production
+    - name: Build release binary
+      run: cargo build --release --verbose
+
+    # 5. Extract the binary and upload it as a GitHub Actions artifact
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rust-binary-linux
+        # Replace 'your_project_name' with the actual binary name defined in Cargo.toml
+        path: target/release/JereIDE
+        if-no-files-found: error
