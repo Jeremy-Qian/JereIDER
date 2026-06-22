@@ -23,7 +23,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         .and_then(|p| std::path::Path::new(p).extension())
         .and_then(|ext| ext.to_str());
 
-    let highlighter = SyntaxHighlighter::new(14.0, extension);
+    let mut highlighter = SyntaxHighlighter::new(14.0, extension);
 
     let mut layouter =
         |ui: &egui::Ui, text: &dyn egui::widgets::TextBuffer, _max_width: f32| {
