@@ -133,7 +133,7 @@ impl eframe::App for JereIDEApp {
                     .max_rect(overlay_rect)
                     .layout(egui::Layout::top_down(egui::Align::LEFT)),
             );
-            jereide_command::command_view::render_command_view(state, &mut overlay_ui);
+            jereide_command::command_view::render_command_view(&mut overlay_ui);
         }
     }
 }
