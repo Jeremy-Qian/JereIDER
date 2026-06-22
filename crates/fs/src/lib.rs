@@ -5,12 +5,6 @@ pub struct FileManager {
     pub current_path: Option<PathBuf>,
 }
 
-impl Default for FileManager {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl FileManager {
     pub fn new() -> Self {
         Self { current_path: None }
