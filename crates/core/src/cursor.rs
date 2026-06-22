@@ -1,4 +1,3 @@
-
 /// For the line/column indicator.
 pub fn char_index_to_line_col(text: &str, char_index: usize) -> (usize, usize) {
     let mut line = 0;

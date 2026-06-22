@@ -10,18 +10,14 @@ impl FileManager {
     }
 
     pub fn open_file_dialog() -> Option<(String, PathBuf)> {
-        let file = rfd::FileDialog::new()
-            .set_title("Open File")
-            .pick_file()?;
+        let file = rfd::FileDialog::new().set_title("Open File").pick_file()?;
 
         let content = std::fs::read_to_string(&file).ok()?;
         Some((content, file))
     }
 
     pub fn save_as_dialog() -> Option<PathBuf> {
-        rfd::FileDialog::new()
-            .set_title("Save File")
-            .save_file()
+        rfd::FileDialog::new().set_title("Save File").save_file()
     }
 
     pub fn save_to_path(content: &str, path: &PathBuf) -> Result<(), std::io::Error> {

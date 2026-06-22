@@ -1,9 +1,9 @@
 use eframe::egui::{self, Color32, FontId, TextFormat};
+use std::sync::OnceLock;
 use syntect::easy::HighlightLines;
 use syntect::highlighting::{HighlightState, Theme, ThemeSet};
 use syntect::parsing::{ParseState, SyntaxReference, SyntaxSet};
 use syntect::util::LinesWithEndings;
-use std::sync::OnceLock;
 
 fn syntax_set() -> &'static SyntaxSet {
     static SS: OnceLock<SyntaxSet> = OnceLock::new();
@@ -88,11 +88,7 @@ impl SyntaxHighlighter {
             HighlightLines::new(self.syntax, self.theme)
         } else {
             let prev = &self.lines[first_diff - 1];
-            HighlightLines::from_state(
-                self.theme,
-                prev.hl_state.clone(),
-                prev.parse_state.clone(),
-            )
+            HighlightLines::from_state(self.theme, prev.hl_state.clone(), prev.parse_state.clone())
         };
 
         let mut new_cache: Vec<CachedLine> = Vec::new();

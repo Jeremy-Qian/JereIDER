@@ -128,10 +128,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                 let painter = ui.painter();
                 // Current Line Highlighting
                 painter.rect_filled(
-                    egui::Rect::from_min_size(
-                        egui::pos2(hl_x, y),
-                        egui::vec2(hl_w, row_height),
-                    ),
+                    egui::Rect::from_min_size(egui::pos2(hl_x, y), egui::vec2(hl_w, row_height)),
                     0.0,
                     egui::Color32::from_rgb(255, 255, 208),
                 );

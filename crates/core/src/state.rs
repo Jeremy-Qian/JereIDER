@@ -19,7 +19,6 @@ pub struct AppState {
     pub was_fullscreen: bool,
 }
 
-
 /// Another new method.
 impl AppState {
     pub fn new() -> Self {

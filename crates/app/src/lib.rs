@@ -94,7 +94,9 @@ impl eframe::App for JereIDEApp {
                     let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                     ctx.send_viewport_cmd(egui::ViewportCommand::Fullscreen(!is_fullscreen));
                 }
-                _ => jereide_code::edit::handle_edit_action(&mut self.state, &ctx, event_id.as_ref()),
+                _ => {
+                    jereide_code::edit::handle_edit_action(&mut self.state, &ctx, event_id.as_ref())
+                }
             }
         }
 

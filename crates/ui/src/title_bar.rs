@@ -8,12 +8,12 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
         egui::vec2(available.x, gray_bar_height),
         egui::Sense::hover(),
     );
-    ui.painter().rect_filled(rect, 0.0, egui::Color32::from_rgb(245, 245, 245));
+    ui.painter()
+        .rect_filled(rect, 0.0, egui::Color32::from_rgb(245, 245, 245));
     ui.scope_builder(egui::UiBuilder::new().max_rect(rect), |ui| {
-        ui.style_mut().text_styles.insert(
-            egui::TextStyle::Button,
-            egui::FontId::proportional(12.0),
-        );
+        ui.style_mut()
+            .text_styles
+            .insert(egui::TextStyle::Button, egui::FontId::proportional(12.0));
 
         ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
             if is_fullscreen {

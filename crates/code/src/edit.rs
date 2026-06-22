@@ -57,9 +57,9 @@ fn action_cut(state: &mut AppState, ctx: &egui::Context) {
             }
             edit_state
                 .cursor
-                .set_char_range(Some(egui::text::CCursorRange::one(egui::text::CCursor::new(
-                    start,
-                ))));
+                .set_char_range(Some(egui::text::CCursorRange::one(
+                    egui::text::CCursor::new(start),
+                )));
             edit_state.store(ctx, state.editor_id);
         }
     }
@@ -85,9 +85,9 @@ fn action_paste(state: &mut AppState, ctx: &egui::Context) {
             let new_pos = start + clipboard.chars().count();
             edit_state
                 .cursor
-                .set_char_range(Some(egui::text::CCursorRange::one(egui::text::CCursor::new(
-                    new_pos,
-                ))));
+                .set_char_range(Some(egui::text::CCursorRange::one(
+                    egui::text::CCursor::new(new_pos),
+                )));
             edit_state.store(ctx, state.editor_id);
         }
     }
