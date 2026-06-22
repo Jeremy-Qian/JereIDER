@@ -84,12 +84,10 @@ impl eframe::App for JereIDEApp {
                 "save" => self.handle_save(),
                 "save_as" => self.handle_save_as(),
                 "quit" => std::process::exit(0),
-                "about" => {}
                 "fullscreen" => {
                     let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                     ctx.send_viewport_cmd(egui::ViewportCommand::Fullscreen(!is_fullscreen));
                 }
-                "save_all" => {}
                 _ => jereide_code::edit::handle_edit_action(&mut self.state, &ctx, event_id.as_ref()),
             }
         }
