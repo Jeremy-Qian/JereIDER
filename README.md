@@ -39,13 +39,14 @@ cargo run
 
 ## FAQ
 
-<details> 
-    <summary>
-        How is this different from other editors?
-    </summary> 
+### How is this different from other editors?
+Not really.
 
-    * Not really.
-</details>
+### Why is it called JereIDER?
+JereIDE, and a R for Rust.
+
+### When will it replace the current JereIDE?
+Uh, when it matches the same functionality the current JereIDE offers.
 
 ## License
 This project is licensed under the MIT License.
