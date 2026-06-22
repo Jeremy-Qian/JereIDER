@@ -3,11 +3,15 @@ use jereide_core::{AppState, CurrentView};
 use jereide_fs::FileManager;
 use jereide_menu::AppMenu;
 
+/// Contains the app state, the menu, and the file manager.
+
 pub struct JereIDEApp {
     state: AppState,
     app_menu: AppMenu,
     file_manager: FileManager,
 }
+
+/// Just defaults for it.
 
 impl JereIDEApp {
     pub fn new(app_menu: AppMenu) -> Self {
@@ -37,6 +41,7 @@ impl JereIDEApp {
         match path {
             Some(p) => {
                 if let Err(e) = FileManager::save_to_path(&self.state.code_text, &p) {
+                    // TODO: Pop out a message thing instead of printing an error
                     eprintln!("Failed to save file: {}", e);
                 }
             }
@@ -47,6 +52,7 @@ impl JereIDEApp {
     fn handle_save_as(&mut self) {
         if let Some(path) = FileManager::save_as_dialog() {
             if let Err(e) = FileManager::save_to_path(&self.state.code_text, &path) {
+                // TODO: Pop out a message thing instead of printing an error
                 eprintln!("Failed to save file: {}", e);
             } else {
                 self.state.current_file_path = Some(path.display().to_string());
@@ -59,11 +65,12 @@ impl JereIDEApp {
 impl eframe::App for JereIDEApp {
     fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         let ctx = ui.ctx().clone();
-
+        // Actually the only target is macOS so far, Windows support is planned
         #[cfg(target_os = "macos")]
         {
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
             if self.state.was_fullscreen != is_fullscreen || !self.state.traffic_lights_positioned {
+                // Position the traffic lights like how Zed does it
                 jereide_window::position_traffic_lights(frame, 2.0, -3.0);
                 self.state.traffic_lights_positioned = true;
             }
@@ -76,6 +83,7 @@ impl eframe::App for JereIDEApp {
         }
 
         for event_id in self.app_menu.poll_events() {
+            // The menu actions
             match event_id.as_ref() {
                 "new" => self.handle_new(),
                 "open" => self.handle_open(),
@@ -98,6 +106,7 @@ impl eframe::App for JereIDEApp {
             .frame(egui::Frame::NONE.fill(egui::Color32::WHITE))
             .show_inside(ui, |ui| {
                 let style = ui.style_mut();
+                // TODO: Put constants somewhere else
                 style.visuals.extreme_bg_color = egui::Color32::WHITE;
                 style.spacing.item_spacing.y = 0.0;
 
@@ -113,7 +122,9 @@ impl eframe::App for JereIDEApp {
                 jereide_code::code_view::render_code_view(state, &mut code_ui);
             });
 
+        // Command view covers everything
         if state.current_view == CurrentView::Command {
+            // TODO: Put constants somewhere else
             let title_bar_height = 34.0;
             let full_area = ui.ctx().content_rect();
             let overlay_rect = egui::Rect::from_min_size(
