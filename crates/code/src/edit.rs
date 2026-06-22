@@ -1,6 +1,7 @@
 use eframe::egui;
 use jereide_core::{char_range_substring, delete_char_range, insert_at_char_index, AppState};
 
+// All the actions are handled here
 pub fn handle_edit_action(state: &mut AppState, ctx: &egui::Context, action: &str) {
     match action {
         "select_all" => action_select_all(state, ctx),
@@ -11,11 +12,13 @@ pub fn handle_edit_action(state: &mut AppState, ctx: &egui::Context, action: &st
         "redo" => action_redo(state, ctx),
         "githubstar" => action_github_star(state, ctx),
         _ => {
+            // This isn't supposed to happen, but who knows?
             eprintln!("Unknown edit action: '{}'", action);
         }
     }
 }
 
+/// Selects everything.
 fn action_select_all(state: &AppState, ctx: &egui::Context) {
     if let Some(mut edit_state) = egui::TextEdit::load_state(ctx, state.editor_id) {
         let len = state.code_text.chars().count();
@@ -27,6 +30,7 @@ fn action_select_all(state: &AppState, ctx: &egui::Context) {
     }
 }
 
+/// Copies selected.
 fn action_copy(state: &AppState, ctx: &egui::Context) {
     if let Some(edit_state) = egui::TextEdit::load_state(ctx, state.editor_id) {
         if let Some(range) = edit_state.cursor.char_range() {
@@ -40,6 +44,7 @@ fn action_copy(state: &AppState, ctx: &egui::Context) {
     }
 }
 
+/// Cuts selected.
 fn action_cut(state: &mut AppState, ctx: &egui::Context) {
     if let Some(mut edit_state) = egui::TextEdit::load_state(ctx, state.editor_id) {
         if let Some(range) = edit_state.cursor.char_range() {
@@ -60,6 +65,7 @@ fn action_cut(state: &mut AppState, ctx: &egui::Context) {
     }
 }
 
+/// Pastes from the clipboard.
 fn action_paste(state: &mut AppState, ctx: &egui::Context) {
     let clipboard = arboard::Clipboard::new()
         .ok()
@@ -87,6 +93,7 @@ fn action_paste(state: &mut AppState, ctx: &egui::Context) {
     }
 }
 
+/// Undoes last action(this is pretty complicated)
 fn action_undo(state: &mut AppState, ctx: &egui::Context) {
     if let Some(mut edit_state) = egui::TextEdit::load_state(ctx, state.editor_id) {
         let current = (
@@ -105,7 +112,7 @@ fn action_undo(state: &mut AppState, ctx: &egui::Context) {
         }
     }
 }
-
+/// Redo
 fn action_redo(state: &mut AppState, ctx: &egui::Context) {
     if let Some(mut edit_state) = egui::TextEdit::load_state(ctx, state.editor_id) {
         let current = (
@@ -124,9 +131,11 @@ fn action_redo(state: &mut AppState, ctx: &egui::Context) {
         }
     }
 }
-
+/// Star us on GitHub!
 fn action_github_star(_state: &AppState, ctx: &egui::Context) {
     ctx.open_url(egui::OpenUrl {
+        /// TODO: Use real URL instead
+        ///
         url: String::from("https://github.com/jeremy-qian/jereide"),
         new_tab: true,
     });
