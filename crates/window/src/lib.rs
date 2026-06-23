@@ -1,3 +1,30 @@
+/// Sets the document-edited state on the native macOS window.
+/// When `edited` is `true`, a small dark dot appears inside the red close button,
+/// indicating unsaved changes — just like Notes, TextEdit, and every other native app.
+#[cfg(target_os = "macos")]
+pub fn set_document_edited(frame: &eframe::Frame, edited: bool) {
+    use objc2::msg_send;
+    use objc2::runtime::AnyObject;
+    use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+
+    let Ok(handle) = frame.window_handle() else {
+        return;
+    };
+    let RawWindowHandle::AppKit(appkit) = handle.as_raw() else {
+        return;
+    };
+
+    let ns_view = appkit.ns_view.as_ptr() as *mut AnyObject;
+
+    unsafe {
+        let ns_window: *mut AnyObject = msg_send![ns_view, window];
+        if ns_window.is_null() {
+            return;
+        }
+        let _: () = msg_send![ns_window, setDocumentEdited: edited];
+    }
+}
+
 #[cfg(target_os = "macos")]
 pub fn position_traffic_lights(frame: &eframe::Frame, offset_x: f64, offset_y: f64) {
     use objc2::msg_send;

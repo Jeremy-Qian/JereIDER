@@ -53,8 +53,9 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
                     .and_then(|n| n.to_str())
                     .unwrap_or("Untitled")
                     .to_string();
+                let modified_mark = if state.is_modified() { " *" } else { "" };
                 ui.label(
-                    egui::RichText::new(file_label)
+                    egui::RichText::new(format!("{}{}", file_label, modified_mark))
                         .color(egui::Color32::from_rgb(80, 80, 80))
                         .size(12.0),
                 );

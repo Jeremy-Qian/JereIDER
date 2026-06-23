@@ -26,6 +26,7 @@ impl JereIDEApp {
         self.state.code_text.clear();
         self.state.current_file_path = None;
         self.file_manager.current_path = None;
+        self.state.mark_saved();
     }
 
     fn handle_open(&mut self) {
@@ -33,6 +34,7 @@ impl JereIDEApp {
             self.state.code_text = content;
             self.state.current_file_path = Some(path.display().to_string());
             self.file_manager.current_path = Some(path);
+            self.state.mark_saved();
         }
     }
 
@@ -43,6 +45,8 @@ impl JereIDEApp {
                 if let Err(e) = FileManager::save_to_path(&self.state.code_text, &p) {
                     // TODO: Pop out a message thing instead of printing an error
                     eprintln!("Failed to save file: {}", e);
+                } else {
+                    self.state.mark_saved();
                 }
             }
             None => self.handle_save_as(),
@@ -57,6 +61,7 @@ impl JereIDEApp {
             } else {
                 self.state.current_file_path = Some(path.display().to_string());
                 self.file_manager.current_path = Some(path);
+                self.state.mark_saved();
             }
         }
     }
@@ -68,6 +73,20 @@ impl eframe::App for JereIDEApp {
         // Actually the only target is macOS so far, Windows support is planned
         #[cfg(target_os = "macos")]
         {
+            // Sync the native close-button dirty dot, but only when the value
+            // actually changes — AppKit re-lays out the title bar in response to
+            // setDocumentEdited:, and doing it every frame would keep resetting
+            // our custom traffic light positions.
+            let is_modified = self.state.is_modified();
+            if is_modified != self.state.document_edited {
+                self.state.document_edited = is_modified;
+                jereide_window::set_document_edited(frame, is_modified);
+                // AppKit may re-lay out the title bar in response to
+                // setDocumentEdited:, so force re-positioning of the
+                // traffic lights on this frame.
+                self.state.traffic_lights_positioned = false;
+            }
+
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
             if self.state.was_fullscreen != is_fullscreen || !self.state.traffic_lights_positioned {
                 // Position the traffic lights like how Zed does it
