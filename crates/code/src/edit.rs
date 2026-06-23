@@ -134,7 +134,7 @@ fn action_redo(state: &mut AppState, ctx: &egui::Context) {
 /// Star us on GitHub!
 fn action_github_star(_state: &AppState, ctx: &egui::Context) {
     ctx.open_url(egui::OpenUrl {
-        /// TODO: Use real URL instead
+        // TODO: Use real URL instead
         url: String::from("https://github.com/jeremy-qian/jereide"),
         new_tab: true,
     });
