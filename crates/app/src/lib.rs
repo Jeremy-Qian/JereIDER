@@ -26,26 +26,23 @@ impl JereIDEApp {
     }
 
     fn handle_new(&mut self) {
-        self.state.code_text.clear();
-        self.state.current_file_path = None;
-        self.file_manager.current_path = None;
-        self.state.mark_saved();
+        self.state.new_tab();
     }
 
     fn handle_open(&mut self) {
         if let Some((content, path)) = FileManager::open_file_dialog() {
-            self.state.code_text = content;
-            self.state.current_file_path = Some(path.display().to_string());
+            let path_str = path.display().to_string();
+            self.state.open_file(path_str, content);
             self.file_manager.current_path = Some(path);
-            self.state.mark_saved();
         }
     }
 
     fn handle_save(&mut self) {
-        let path = self.file_manager.current_path.clone();
+        let path = self.state.current_tab().file_path.clone();
         match path {
             Some(p) => {
-                if let Err(e) = FileManager::save_to_path(&self.state.code_text, &p) {
+                let text = self.state.current_tab().text.clone();
+                if let Err(e) = FileManager::save_to_path(&text, &std::path::PathBuf::from(&p)) {
                     // TODO: Pop out a message thing instead of printing an error
                     eprintln!("Failed to save file: {}", e);
                 } else {
@@ -58,12 +55,14 @@ impl JereIDEApp {
 
     fn handle_save_as(&mut self) {
         if let Some(path) = FileManager::save_as_dialog() {
-            if let Err(e) = FileManager::save_to_path(&self.state.code_text, &path) {
+            let text = self.state.current_tab().text.clone();
+            if let Err(e) = FileManager::save_to_path(&text, &path) {
                 // TODO: Pop out a message thing instead of printing an error
                 eprintln!("Failed to save file: {}", e);
             } else {
-                self.state.current_file_path = Some(path.display().to_string());
-                self.file_manager.current_path = Some(path);
+                let path_str = path.display().to_string();
+                let idx = self.state.active_tab_index;
+                self.state.tabs[idx].file_path = Some(path_str);
                 self.state.mark_saved();
             }
         }
@@ -135,6 +134,9 @@ impl eframe::App for JereIDEApp {
 
                 let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                 jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
+
+                // Tab strip sits between the title bar and the editor.
+                jereide_ui::tab_strip::render_tab_strip(state, ui);
 
                 let content_rect = ui.available_rect_before_wrap();
                 let mut code_ui = ui.new_child(

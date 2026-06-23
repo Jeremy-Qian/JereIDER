@@ -12,7 +12,8 @@ pub fn render_status_bar(state: &AppState, ui: &mut egui::Ui) {
             ui.horizontal(|ui| {
                 ui.label("Ready");
                 ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                    ui.label(format!("{}:{}", state.cursor_line, state.cursor_col));
+                    let tab = state.current_tab();
+                    ui.label(format!("{}:{}", tab.cursor_line, tab.cursor_col));
                 });
             });
         });

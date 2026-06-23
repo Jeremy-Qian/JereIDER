@@ -47,9 +47,14 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         s.bar_width = SCROLL_BAR_WIDTH;
         s
     };
+
+    // Capture the active tab index once for direct field access (avoids
+    // borrow conflicts that helper methods would cause with the TextEdit).
+    let active_idx = state.active_tab_index;
+
     // Incremental Highlighting to make JereIDE faster
-    let extension = state
-        .current_file_path
+    let extension = state.tabs[active_idx]
+        .file_path
         .as_ref()
         .and_then(|p| std::path::Path::new(p).extension())
         .and_then(|ext| ext.to_str());
@@ -77,8 +82,9 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
     });
     let font_id = egui::FontId::monospace(EDITOR_FONT_SIZE);
     let row_height = ui.fonts_mut(|f| f.row_height(&font_id));
-    let line_count = visual_line_count(&state.code_text);
+    let line_count = visual_line_count(&state.tabs[active_idx].text);
     let gutter_w = gutter_width(line_count);
+    let cursor_line = state.tabs[active_idx].cursor_line;
 
     let mut layouter =
         |layouter_ui: &egui::Ui, text: &dyn egui::widgets::TextBuffer, wrap_width: f32| {
@@ -110,18 +116,18 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
 
             let widget_top = ui.cursor().min.y;
             // Complicated painting
-            if state.cursor_line > 0 && state.cursor_line <= line_count {
+            if cursor_line > 0 && cursor_line <= line_count {
                 let y = CUR_GALLEY.with(|g| {
                     let inner_margin_top = EDITOR_INNER_MARGIN_TOP as f32;
                     if let Some(galley) = g.borrow().as_ref() {
-                        let idx = state.cursor_line.saturating_sub(1);
+                        let idx = cursor_line.saturating_sub(1);
                         if idx < galley.rows.len() {
                             widget_top + inner_margin_top + galley.rows[idx].pos.y
                         } else {
                             widget_top + inner_margin_top + idx as f32 * row_height
                         }
                     } else {
-                        let idx = state.cursor_line.saturating_sub(1);
+                        let idx = cursor_line.saturating_sub(1);
                         widget_top + inner_margin_top + idx as f32 * row_height
                     }
                 });
@@ -137,19 +143,21 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             }
             // The Code Editor(TextEdit::code_editor captures Tabs and keeps focus)
             let text_response = ui.add(
-                egui::TextEdit::code_editor(egui::TextEdit::multiline(&mut state.code_text))
-                    .id_source("editor")
-                    .desired_width(viewport.x)
-                    .frame(egui::Frame {
-                        inner_margin: egui::Margin {
-                            left: (gutter_w + EDITOR_INNER_MARGIN_LEFT_EXTRA as f32) as i8,
-                            right: EDITOR_INNER_MARGIN_RIGHT,
-                            top: EDITOR_INNER_MARGIN_TOP,
-                            bottom: EDITOR_INNER_MARGIN_BOTTOM,
-                        },
-                        ..egui::Frame::NONE
-                    })
-                    .layouter(&mut layouter),
+                egui::TextEdit::code_editor(
+                    egui::TextEdit::multiline(&mut state.tabs[active_idx].text),
+                )
+                .id_source("editor")
+                .desired_width(viewport.x)
+                .frame(egui::Frame {
+                    inner_margin: egui::Margin {
+                        left: (gutter_w + EDITOR_INNER_MARGIN_LEFT_EXTRA as f32) as i8,
+                        right: EDITOR_INNER_MARGIN_RIGHT,
+                        top: EDITOR_INNER_MARGIN_TOP,
+                        bottom: EDITOR_INNER_MARGIN_BOTTOM,
+                    },
+                    ..egui::Frame::NONE
+                })
+                .layouter(&mut layouter),
             );
 
             let text_alloc = text_response.rect;
@@ -179,7 +187,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                         for (i, row) in galley.rows.iter().enumerate() {
                             let line_num = i + 1;
                             let y = widget_top + EDITOR_INNER_MARGIN_TOP as f32 + row.pos.y;
-                            let is_current = line_num == state.cursor_line;
+                            let is_current = line_num == cursor_line;
                             let color = if is_current {
                                 GUTTER_TEXT_CURRENT
                             } else {
@@ -213,9 +221,10 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
     // For the status bar Line/Col indicator
     if let Some(edit_state) = egui::TextEdit::load_state(&ctx, response.id) {
         if let Some(range) = edit_state.cursor.char_range() {
-            let (line, col) = char_index_to_line_col(&state.code_text, range.primary.index);
-            state.cursor_line = line;
-            state.cursor_col = col;
+            let (line, col) =
+                char_index_to_line_col(&state.tabs[active_idx].text, range.primary.index);
+            state.tabs[active_idx].cursor_line = line;
+            state.tabs[active_idx].cursor_col = col;
         }
     }
 

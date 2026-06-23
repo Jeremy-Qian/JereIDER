@@ -49,6 +49,9 @@ pub const STATUS_BAR_BG: Color32 = Color32::WHITE;
 /// Height of the custom title bar.
 pub const TITLE_BAR_HEIGHT: f32 = 34.0;
 
+/// Height of the tab strip.
+pub const TAB_STRIP_HEIGHT: f32 = 32.0;
+
 /// Font size for title-bar buttons and labels.
 pub const TITLE_BAR_FONT_SIZE: f32 = 12.0;
 

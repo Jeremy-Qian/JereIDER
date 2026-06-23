@@ -1,8 +1,8 @@
 use eframe::egui;
 use jereide_core::{
-    AppState, CurrentView, TITLE_BAR_BG, TITLE_BAR_FILENAME_SPACE,
-    TITLE_BAR_FONT_SIZE, TITLE_BAR_FULLSCREEN_SPACE, TITLE_BAR_HEIGHT,
-    TITLE_BAR_POPUP_GAP, TITLE_BAR_TEXT, TITLE_BAR_TRAFFIC_SPACE,
+    AppState, CurrentView, TITLE_BAR_BG, TITLE_BAR_FONT_SIZE,
+    TITLE_BAR_FULLSCREEN_SPACE, TITLE_BAR_HEIGHT, TITLE_BAR_POPUP_GAP,
+    TITLE_BAR_TRAFFIC_SPACE,
 };
 
 pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: bool) {
@@ -47,21 +47,10 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
                 state.switch_to_view(CurrentView::Command);
             }
 
-            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
-                ui.add_space(TITLE_BAR_FILENAME_SPACE);
-                let file_label = state
-                    .current_file_path
-                    .as_ref()
-                    .and_then(|p| std::path::Path::new(p).file_name())
-                    .and_then(|n| n.to_str())
-                    .unwrap_or("Untitled")
-                    .to_string();
-                let modified_mark = if state.is_modified() { " *" } else { "" };
-                ui.label(
-                    egui::RichText::new(format!("{}{}", file_label, modified_mark))
-                        .color(TITLE_BAR_TEXT)
-                        .size(TITLE_BAR_FONT_SIZE),
-                );
+            // Filename is now shown in the tab strip below.
+            // Keep the right side clean for future toolbar items.
+            ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |_ui| {
+                // Reserved for future right-side title bar content.
             });
         });
     });
