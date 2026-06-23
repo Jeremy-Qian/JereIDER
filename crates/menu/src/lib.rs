@@ -2,6 +2,7 @@ use muda::{
     accelerator::Accelerator, Menu, MenuEvent, MenuId, MenuItem, PredefinedMenuItem, Submenu,
 };
 
+/// A struct about the menu.
 pub struct AppMenu {
     menu: Menu,
     receiver: &'static crossbeam_channel::Receiver<MenuEvent>,
@@ -9,8 +10,10 @@ pub struct AppMenu {
 }
 
 impl AppMenu {
+    /// Creates all these stuff
     pub fn new() -> Self {
         let app_menu = Submenu::with_id("jereide", "jereide", true);
+        // Add lots of predefined items and a Star on GitHub
         app_menu
             .append_items(&[
                 &PredefinedMenuItem::about(None, None),
@@ -27,6 +30,7 @@ impl AppMenu {
             .ok();
 
         let file_menu = Submenu::with_id("file", "File", true);
+        // The file menu
         file_menu
             .append_items(&[
                 &MenuItem::with_id(
@@ -56,6 +60,7 @@ impl AppMenu {
             ])
             .ok();
 
+        // The edit menu
         let edit_menu = Submenu::with_id("edit", "Edit", true);
         edit_menu
             .append_items(&[
@@ -100,11 +105,15 @@ impl AppMenu {
             ])
             .ok();
 
+        // The view menu
         let view_menu = Submenu::with_id("view", "View", true);
         view_menu
             .append_items(&[&PredefinedMenuItem::fullscreen(None)])
             .ok();
 
+        // TODO: A help menu
+
+        // Put everything together
         let menu = Menu::new();
         menu.append(&app_menu).ok();
         menu.append(&file_menu).ok();
