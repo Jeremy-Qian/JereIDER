@@ -5,16 +5,19 @@ use syntect::highlighting::{HighlightState, Theme, ThemeSet};
 use syntect::parsing::{ParseState, SyntaxReference, SyntaxSet};
 use syntect::util::LinesWithEndings;
 
+/// Get a default syntax set or something.
 fn syntax_set() -> &'static SyntaxSet {
     static SS: OnceLock<SyntaxSet> = OnceLock::new();
     SS.get_or_init(SyntaxSet::load_defaults_newlines)
 }
 
+/// Default theme sets?
 fn theme_set() -> &'static ThemeSet {
     static TS: OnceLock<ThemeSet> = OnceLock::new();
     TS.get_or_init(ThemeSet::load_defaults)
 }
 
+/// For incremental highlighting
 #[derive(Clone)]
 struct CachedLine {
     content: String,
@@ -23,6 +26,7 @@ struct CachedLine {
     parse_state: ParseState,
 }
 
+/// Includes lots of metadata
 pub struct SyntaxHighlighter {
     font_id: FontId,
     syntax: &'static SyntaxReference,
@@ -31,19 +35,26 @@ pub struct SyntaxHighlighter {
     cached_text: String,
 }
 
+/// Syntax highlighter with syntect
 impl SyntaxHighlighter {
     pub fn new(font_size: f32, extension: Option<&str>) -> Self {
         let ss = syntax_set();
+        // Use the extension(main.rs -> Rust)
+        // or fall back to plain text
         let syntax = extension
             .and_then(|ext| ss.find_syntax_by_extension(ext))
             .unwrap_or_else(|| ss.find_syntax_plain_text());
 
         let ts = theme_set();
+
+        // InspiredGitHub is the best in all the
+        // defaults, falls back to base16-ocean
         let theme = ts
             .themes
             .get("InspiredGitHub")
             .unwrap_or_else(|| &ts.themes["base16-ocean.light"]);
-
+        
+        // Monospace font, of course.
         Self {
             font_id: FontId::monospace(font_size),
             syntax,
@@ -52,14 +63,17 @@ impl SyntaxHighlighter {
             cached_text: String::new(),
         }
     }
-
+    
+    /// Highlights.
     pub fn highlight(&mut self, text: &str) -> egui::text::LayoutJob {
         if text.is_empty() {
             self.lines.clear();
             self.cached_text.clear();
             return egui::text::LayoutJob::default();
         }
-
+        
+        // If text didn't change, no need to
+        // waste compute.
         if text == self.cached_text {
             return self.build_job(text);
         }
@@ -68,7 +82,8 @@ impl SyntaxHighlighter {
 
         let ss = syntax_set();
         let new_lines: Vec<&str> = LinesWithEndings::from(text).collect();
-
+            
+        // Incremental stuff
         let first_diff = self
             .lines
             .iter()
