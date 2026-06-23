@@ -2,7 +2,14 @@ use std::cell::RefCell;
 use std::sync::Arc;
 
 use eframe::egui;
-use jereide_core::{char_index_to_line_col, AppState};
+use jereide_core::{
+    char_index_to_line_col, AppState, CURRENT_LINE_BG, EDITOR_FONT_SIZE,
+    EDITOR_INNER_MARGIN_BOTTOM, EDITOR_INNER_MARGIN_LEFT_EXTRA,
+    EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG, GUTTER_BORDER,
+    GUTTER_BORDER_WIDTH, GUTTER_DIGIT_WIDTH, GUTTER_HIGHLIGHT_OFFSET,
+    GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
+    GUTTER_TEXT, GUTTER_TEXT_CURRENT, SCROLL_BAR_WIDTH,
+};
 use jereide_syntax::SyntaxHighlighter;
 
 // A new thread for the syntax highlighting, I guess.
@@ -12,8 +19,6 @@ thread_local! {
 
     static CUR_GALLEY: RefCell<Option<Arc<egui::Galley>>> = const { RefCell::new(None) };
 }
-
-const DIGIT_W: f32 = 8.0;
 
 // Pretty useless functions, but...
 fn visual_line_count(text: &str) -> usize {
@@ -26,21 +31,20 @@ fn visual_line_count(text: &str) -> usize {
 
 fn gutter_width(line_count: usize) -> f32 {
     let digit_count = (line_count as f64).log10().floor() as usize + 1;
-    10.0 + digit_count as f32 * DIGIT_W + 6.0
+    GUTTER_PADDING_LEFT + digit_count as f32 * GUTTER_DIGIT_WIDTH + GUTTER_PADDING_RIGHT
 }
 
 pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
     let ctx = ui.ctx().clone();
 
     let style = ui.style_mut();
-    // TODO: Put constants somewhere else
     style.visuals.extreme_bg_color = egui::Color32::WHITE;
     style.visuals.widgets.inactive.bg_stroke = egui::Stroke::NONE;
     style.visuals.widgets.hovered.bg_stroke = egui::Stroke::NONE;
     style.visuals.widgets.active.bg_stroke = egui::Stroke::NONE;
     style.spacing.scroll = {
         let mut s = egui::style::ScrollStyle::solid();
-        s.bar_width = 12.0;
+        s.bar_width = SCROLL_BAR_WIDTH;
         s
     };
     // Incremental Highlighting to make JereIDE faster
@@ -62,17 +66,16 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
 
     if ext_changed {
         HIGHLIGHTER.with(|hl| {
-            *hl.borrow_mut() = Some(SyntaxHighlighter::new(14.0, extension));
+            *hl.borrow_mut() = Some(SyntaxHighlighter::new(EDITOR_FONT_SIZE, extension));
         });
     }
 
     HIGHLIGHTER.with(|hl| {
         if hl.borrow().is_none() {
-            *hl.borrow_mut() = Some(SyntaxHighlighter::new(14.0, extension));
+            *hl.borrow_mut() = Some(SyntaxHighlighter::new(EDITOR_FONT_SIZE, extension));
         }
     });
-    // TODO: Put constants somewhere else
-    let font_id = egui::FontId::monospace(14.0);
+    let font_id = egui::FontId::monospace(EDITOR_FONT_SIZE);
     let row_height = ui.fonts_mut(|f| f.row_height(&font_id));
     let line_count = visual_line_count(&state.code_text);
     let gutter_w = gutter_width(line_count);
@@ -109,7 +112,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             // Complicated painting
             if state.cursor_line > 0 && state.cursor_line <= line_count {
                 let y = CUR_GALLEY.with(|g| {
-                    let inner_margin_top = 10.0;
+                    let inner_margin_top = EDITOR_INNER_MARGIN_TOP as f32;
                     if let Some(galley) = g.borrow().as_ref() {
                         let idx = state.cursor_line.saturating_sub(1);
                         if idx < galley.rows.len() {
@@ -122,15 +125,14 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                         widget_top + inner_margin_top + idx as f32 * row_height
                     }
                 });
-                // TODO: Put constants somewhere else
-                let hl_x = gutter_w + 2.0;
-                let hl_w = (viewport.x - gutter_w - 2.0).max(0.0);
+                let hl_x = gutter_w + GUTTER_HIGHLIGHT_OFFSET;
+                let hl_w = (viewport.x - gutter_w - GUTTER_HIGHLIGHT_OFFSET).max(0.0);
                 let painter = ui.painter();
                 // Current Line Highlighting
                 painter.rect_filled(
                     egui::Rect::from_min_size(egui::pos2(hl_x, y), egui::vec2(hl_w, row_height)),
                     0.0,
-                    egui::Color32::from_rgb(255, 255, 208),
+                    CURRENT_LINE_BG,
                 );
             }
             // The Code Editor(TextEdit::code_editor captures Tabs and keeps focus)
@@ -140,10 +142,10 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     .desired_width(viewport.x)
                     .frame(egui::Frame {
                         inner_margin: egui::Margin {
-                            left: (gutter_w + 6.0) as i8,
-                            right: 10,
-                            top: 10,
-                            bottom: 10,
+                            left: (gutter_w + EDITOR_INNER_MARGIN_LEFT_EXTRA as f32) as i8,
+                            right: EDITOR_INNER_MARGIN_RIGHT,
+                            top: EDITOR_INNER_MARGIN_TOP,
+                            bottom: EDITOR_INNER_MARGIN_BOTTOM,
                         },
                         ..egui::Frame::NONE
                     })
@@ -163,28 +165,28 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                         egui::vec2(gutter_w, gutter_y1 - gutter_y0),
                     ),
                     0.0,
-                    egui::Color32::from_rgb(245, 245, 245),
+                    GUTTER_BG,
                 );
 
                 painter.vline(
                     gutter_w,
                     gutter_y0..=gutter_y1,
-                    egui::Stroke::new(1.0, egui::Color32::from_rgb(224, 224, 224)),
+                    egui::Stroke::new(GUTTER_BORDER_WIDTH, GUTTER_BORDER),
                 );
 
                 CUR_GALLEY.with(|g| {
                     if let Some(galley) = g.borrow().as_ref() {
                         for (i, row) in galley.rows.iter().enumerate() {
                             let line_num = i + 1;
-                            let y = widget_top + 10.0 + row.pos.y;
+                            let y = widget_top + EDITOR_INNER_MARGIN_TOP as f32 + row.pos.y;
                             let is_current = line_num == state.cursor_line;
                             let color = if is_current {
-                                egui::Color32::from_rgb(48, 48, 48)
+                                GUTTER_TEXT_CURRENT
                             } else {
-                                egui::Color32::from_rgb(145, 145, 145)
+                                GUTTER_TEXT
                             };
                             painter.text(
-                                egui::pos2(gutter_w - 5.0, y),
+                                egui::pos2(gutter_w - GUTTER_LINE_NUMBER_RIGHT_OFFSET, y),
                                 egui::Align2::RIGHT_TOP,
                                 line_num.to_string(),
                                 font_id.clone(),

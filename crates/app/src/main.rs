@@ -1,14 +1,14 @@
+use jereide_core::{WINDOW_HEIGHT, WINDOW_WIDTH};
 use jereide_menu::AppMenu;
 
-// Entry point to JereIDE. Initiated with 800x600 size,
-// no title bar, no title, and a full-size content view.
+// Entry point to JereIDE.
 
 fn main() -> Result<(), eframe::Error> {
     let app_menu = AppMenu::new();
 
     let options = eframe::NativeOptions {
         viewport: eframe::egui::ViewportBuilder::default()
-            .with_inner_size([800.0, 600.0])
+            .with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
             .with_titlebar_shown(false)
             .with_title_shown(false)
             .with_fullsize_content_view(true),

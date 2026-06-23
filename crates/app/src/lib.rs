@@ -1,5 +1,8 @@
 use eframe::egui;
-use jereide_core::{AppState, CurrentView};
+use jereide_core::{
+    AppState, CurrentView, TITLE_BAR_HEIGHT, TRAFFIC_LIGHT_OFFSET_X,
+    TRAFFIC_LIGHT_OFFSET_Y,
+};
 use jereide_fs::FileManager;
 use jereide_menu::AppMenu;
 
@@ -90,7 +93,7 @@ impl eframe::App for JereIDEApp {
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
             if self.state.was_fullscreen != is_fullscreen || !self.state.traffic_lights_positioned {
                 // Position the traffic lights like how Zed does it
-                jereide_window::position_traffic_lights(frame, 2.0, -3.0);
+                jereide_window::position_traffic_lights(frame, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y);
                 self.state.traffic_lights_positioned = true;
             }
             self.state.was_fullscreen = is_fullscreen;
@@ -124,11 +127,10 @@ impl eframe::App for JereIDEApp {
         jereide_ui::status_bar::render_status_bar(state, ui);
 
         egui::CentralPanel::default()
-            .frame(egui::Frame::NONE.fill(egui::Color32::WHITE))
+            .frame(egui::Frame::NONE.fill(jereide_core::EDITOR_BG))
             .show_inside(ui, |ui| {
                 let style = ui.style_mut();
-                // TODO: Put constants somewhere else
-                style.visuals.extreme_bg_color = egui::Color32::WHITE;
+                style.visuals.extreme_bg_color = jereide_core::EDITOR_BG;
                 style.spacing.item_spacing.y = 0.0;
 
                 let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
@@ -145,8 +147,7 @@ impl eframe::App for JereIDEApp {
 
         // Command view covers everything
         if state.current_view == CurrentView::Command {
-            // TODO: Put constants somewhere else
-            let title_bar_height = 34.0;
+            let title_bar_height = TITLE_BAR_HEIGHT;
             let full_area = ui.ctx().content_rect();
             let overlay_rect = egui::Rect::from_min_size(
                 egui::pos2(full_area.left(), full_area.top() + title_bar_height),
