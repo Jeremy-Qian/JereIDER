@@ -75,17 +75,10 @@ impl eframe::App for JereIDEApp {
         // Actually the only target is macOS so far, Windows support is planned
         #[cfg(target_os = "macos")]
         {
-            // Sync the native close-button dirty dot, but only when the value
-            // actually changes — AppKit re-lays out the title bar in response to
-            // setDocumentEdited:, and doing it every frame would keep resetting
-            // our custom traffic light positions.
             let is_modified = self.state.is_modified();
             if is_modified != self.state.document_edited {
                 self.state.document_edited = is_modified;
                 jereide_window::set_document_edited(frame, is_modified);
-                // AppKit may re-lay out the title bar in response to
-                // setDocumentEdited:, so force re-positioning of the
-                // traffic lights on this frame.
                 self.state.traffic_lights_positioned = false;
             }
 
@@ -144,6 +137,7 @@ impl eframe::App for JereIDEApp {
                         .max_rect(content_rect)
                         .layout(egui::Layout::top_down(egui::Align::LEFT)),
                 );
+                code_ui.set_clip_rect(content_rect);
                 jereide_code::code_view::render_code_view(state, &mut code_ui);
             });
 
