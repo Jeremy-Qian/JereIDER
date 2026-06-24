@@ -29,7 +29,7 @@ pub const TAB_CLOSE_ICON_HOVER: Color32 = Color32::from_rgb(60, 60, 60);
 pub const TAB_MODIFIED_DOT: Color32 = Color32::from_rgb(210, 150, 30);
 
 pub const TITLE_BAR_HEIGHT: f32 = 34.0;
-pub const TAB_STRIP_HEIGHT: f32 = 32.0;
+pub const TAB_STRIP_HEIGHT: f32 = 30.0;
 pub const TITLE_BAR_FONT_SIZE: f32 = 12.0;
 pub const TITLE_BAR_TRAFFIC_SPACE: f32 = 75.0;
 pub const TITLE_BAR_FULLSCREEN_SPACE: f32 = 7.0;
@@ -59,6 +59,8 @@ pub const TAB_CLOSE_ICON_HALF: f32 = 3.5;
 pub const TAB_CLOSE_STROKE: f32 = 1.5;
 pub const TAB_MODIFIED_DOT_RADIUS: f32 = 3.5;
 pub const TAB_MODIFIED_DOT_GAP: f32 = 6.0;
+pub const TAB_BORDER_WIDTH: f32 = 1.0;
+pub const TAB_FONT_SIZE: f32 = 12.0;
 
 pub const WINDOW_WIDTH: f32 = 800.0;
 pub const WINDOW_HEIGHT: f32 = 600.0;
