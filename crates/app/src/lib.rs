@@ -1,6 +1,6 @@
 use eframe::egui;
 use jereide_core::{
-    AppState, CurrentView, TITLE_BAR_HEIGHT, TRAFFIC_LIGHT_OFFSET_X,
+    AppState, CurrentView, ITEM_SPACING_Y, TITLE_BAR_HEIGHT, TRAFFIC_LIGHT_OFFSET_X,
     TRAFFIC_LIGHT_OFFSET_Y,
 };
 use jereide_fs::FileManager;
@@ -130,7 +130,7 @@ impl eframe::App for JereIDEApp {
             .show_inside(ui, |ui| {
                 let style = ui.style_mut();
                 style.visuals.extreme_bg_color = jereide_core::EDITOR_BG;
-                style.spacing.item_spacing.y = 0.0;
+                style.spacing.item_spacing.y = ITEM_SPACING_Y;
 
                 let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                 jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);

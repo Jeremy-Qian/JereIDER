@@ -1,4 +1,5 @@
 use eframe::egui::{self, Color32, FontId, TextFormat};
+use jereide_core::DEFAULT_TEXT;
 use std::sync::OnceLock;
 use syntect::easy::HighlightLines;
 use syntect::highlighting::{HighlightState, Theme, ThemeSet};
@@ -181,7 +182,7 @@ impl SyntaxHighlighter {
             line_start += line.content.len();
         }
 
-        let default_fmt = TextFormat::simple(self.font_id.clone(), Color32::BLACK);
+        let default_fmt = TextFormat::simple(self.font_id.clone(), DEFAULT_TEXT);
         let mut cursor = 0;
         for &(start, end, color) in &sections {
             if start > cursor {

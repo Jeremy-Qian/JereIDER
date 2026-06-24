@@ -65,5 +65,9 @@ pub const TAB_FONT_SIZE: f32 = 12.0;
 
 pub const WINDOW_WIDTH: f32 = 800.0;
 pub const WINDOW_HEIGHT: f32 = 600.0;
+pub const MAIN_CORNER_RADIUS: f32 = 10.0;
+pub const COMMAND_VIEW_FONT_SIZE: f32 = 18.0;
+pub const ITEM_SPACING_Y: f32 = 0.0;
+
 pub const TRAFFIC_LIGHT_OFFSET_X: f64 = 2.0;
 pub const TRAFFIC_LIGHT_OFFSET_Y: f64 = -3.0;

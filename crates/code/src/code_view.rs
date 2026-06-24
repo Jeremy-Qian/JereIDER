@@ -3,8 +3,8 @@ use std::sync::Arc;
 
 use eframe::egui;
 use jereide_core::{
-    char_index_to_line_col, AppState, CURRENT_LINE_BG, EDITOR_FONT_SIZE,
-    EDITOR_INNER_MARGIN_BOTTOM, EDITOR_INNER_MARGIN_LEFT_EXTRA,
+    char_index_to_line_col, AppState, MAIN_CORNER_RADIUS, CURRENT_LINE_BG, EDITOR_BG,
+    EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM, EDITOR_INNER_MARGIN_LEFT_EXTRA,
     EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG, GUTTER_BORDER,
     GUTTER_BORDER_WIDTH, GUTTER_DIGIT_WIDTH, GUTTER_HIGHLIGHT_OFFSET,
     GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
@@ -38,7 +38,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
     let ctx = ui.ctx().clone();
 
     let style = ui.style_mut();
-    style.visuals.extreme_bg_color = egui::Color32::WHITE;
+    style.visuals.extreme_bg_color = EDITOR_BG;
     style.visuals.widgets.inactive.bg_stroke = egui::Stroke::NONE;
     style.visuals.widgets.hovered.bg_stroke = egui::Stroke::NONE;
     style.visuals.widgets.active.bg_stroke = egui::Stroke::NONE;
@@ -137,7 +137,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                 // Current Line Highlighting
                 painter.rect_filled(
                     egui::Rect::from_min_size(egui::pos2(hl_x, y), egui::vec2(hl_w, row_height)),
-                    0.0,
+                    MAIN_CORNER_RADIUS,
                     CURRENT_LINE_BG,
                 );
             }
@@ -172,7 +172,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                         egui::pos2(0.0, gutter_y0),
                         egui::vec2(gutter_w, gutter_y1 - gutter_y0),
                     ),
-                    0.0,
+                    MAIN_CORNER_RADIUS,
                     GUTTER_BG,
                 );
 
