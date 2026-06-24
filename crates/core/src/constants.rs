@@ -49,16 +49,16 @@ pub const GUTTER_LINE_NUMBER_RIGHT_OFFSET: f32 = 5.0;
 pub const SCROLL_BAR_WIDTH: f32 = 12.0;
 pub const STATUS_BAR_MARGIN: Margin = Margin::symmetric(8, 4);
 
-pub const TAB_TOP_MARGIN: f32 = 3.0;
-pub const TAB_PAD_LEFT: f32 = 2.0;
-pub const TAB_PAD_RIGHT: f32 = 2.0;
-pub const TAB_CORNER_RADIUS: u8 = 4;
+pub const TAB_TOP_MARGIN: f32 = 0.0;
+pub const TAB_PAD_LEFT: f32 = 8.0;
+pub const TAB_PAD_RIGHT: f32 = 8.0;
+pub const TAB_CORNER_RADIUS: u8 = 0;
 pub const TAB_CLOSE_BTN_SIZE: f32 = 14.0;
-pub const TAB_CLOSE_BTN_SPACING: f32 = 4.0;
-pub const TAB_CLOSE_ICON_HALF: f32 = 3.0;
-pub const TAB_CLOSE_STROKE: f32 = 1.2;
-pub const TAB_MODIFIED_DOT_RADIUS: f32 = 3.0;
-pub const TAB_MODIFIED_DOT_GAP: f32 = 4.0;
+pub const TAB_CLOSE_BTN_SPACING: f32 = 6.0;
+pub const TAB_CLOSE_ICON_HALF: f32 = 3.5;
+pub const TAB_CLOSE_STROKE: f32 = 1.5;
+pub const TAB_MODIFIED_DOT_RADIUS: f32 = 3.5;
+pub const TAB_MODIFIED_DOT_GAP: f32 = 6.0;
 
 pub const WINDOW_WIDTH: f32 = 800.0;
 pub const WINDOW_HEIGHT: f32 = 600.0;
