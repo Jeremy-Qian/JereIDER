@@ -3,10 +3,10 @@ use std::sync::Arc;
 use eframe::egui::{self, Color32, FontId, Pos2, Rect, Sense, Stroke, Vec2};
 use jereide_core::{
     AppState, TAB_ACTIVE_BG, TAB_ACTIVE_TEXT, TAB_BORDER, TAB_BORDER_WIDTH, TAB_CLOSE_BG_HOVER,
-    TAB_CLOSE_BTN_SIZE, TAB_CLOSE_BTN_SPACING, TAB_CLOSE_ICON, TAB_CLOSE_ICON_HALF,
-    TAB_CLOSE_ICON_HOVER, TAB_CLOSE_STROKE, TAB_CORNER_RADIUS, TAB_FONT_SIZE, TAB_INACTIVE_BG,
-    TAB_INACTIVE_TEXT, TAB_MODIFIED_DOT, TAB_MODIFIED_DOT_GAP, TAB_MODIFIED_DOT_RADIUS,
-    TAB_PAD_LEFT, TAB_PAD_RIGHT, TAB_STRIP_BG, TAB_STRIP_HEIGHT,
+    TAB_CLOSE_BTN_RADIUS, TAB_CLOSE_BTN_SIZE, TAB_CLOSE_BTN_SPACING, TAB_CLOSE_ICON,
+    TAB_CLOSE_ICON_HALF, TAB_CLOSE_ICON_HOVER, TAB_CLOSE_STROKE, TAB_CORNER_RADIUS, TAB_FONT_SIZE,
+    TAB_INACTIVE_BG, TAB_INACTIVE_TEXT, TAB_MODIFIED_DOT, TAB_MODIFIED_DOT_GAP,
+    TAB_MODIFIED_DOT_RADIUS, TAB_PAD_LEFT, TAB_PAD_RIGHT, TAB_STRIP_BG, TAB_STRIP_HEIGHT,
 };
 
 /// Pre-computed data for each tab so we don't re-measure or re-compute
@@ -154,7 +154,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
 
         if tab_hovered[idx] {
             if close_hovered[idx] {
-                painter.rect_filled(layout.close_rect, TAB_CORNER_RADIUS, TAB_CLOSE_BG_HOVER);
+                painter.rect_filled(layout.close_rect, TAB_CLOSE_BTN_RADIUS, TAB_CLOSE_BG_HOVER);
             }
             let icon_color = if close_hovered[idx] {
                 TAB_CLOSE_ICON_HOVER
