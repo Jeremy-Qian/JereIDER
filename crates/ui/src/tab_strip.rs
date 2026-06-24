@@ -27,10 +27,6 @@ const CLOSE_BTN_SPACING: f32 = 6.0;
 const CLOSE_ICON_HALF: f32 = 3.5;
 const CLOSE_STROKE: f32 = 1.5;
 const MODIFIED_DOT_RADIUS: f32 = 3.5;
-const MODIFIED_DOT_GAP: f32 = 4.0;
-const NEW_TAB_BTN_WIDTH: f32 = 24.0;
-const NEW_TAB_BTN_GAP: f32 = 4.0;
-const PLUS_SIZE: f32 = 4.5;
 
 /// Pre-computed data for each tab so we don't re-measure or re-compute
 /// during the paint phase.
@@ -38,16 +34,14 @@ struct TabLayout {
     rect: Rect,
     close_rect: Rect,
     text_pos: Pos2,
-    has_dot: bool,
-    dot_pos: Pos2,
     galley: Arc<egui::Galley>,
 }
 
 pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
     let available = ui.available_size();
-    let (strip_rect, _) = ui.allocate_exact_size(
+    let (strip_rect, strip_resp) = ui.allocate_exact_size(
         Vec2::new(available.x, TAB_STRIP_HEIGHT),
-        Sense::hover(),
+        Sense::click(),
     );
     let tab_bottom = strip_rect.bottom();
     let tab_top = strip_rect.top() + TAB_TOP_MARGIN;
@@ -66,27 +60,18 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         let text_w = galley.size().x;
         let text_h = galley.size().y;
 
-        let has_dot = tab.is_modified();
-        let dot_extra = if has_dot { MODIFIED_DOT_RADIUS * 2.0 + MODIFIED_DOT_GAP } else { 0.0 };
-        let tab_w = TAB_PAD_LEFT + text_w + dot_extra + CLOSE_BTN_SPACING + CLOSE_BTN_SIZE + TAB_PAD_RIGHT;
+        let tab_w = TAB_PAD_LEFT + text_w + CLOSE_BTN_SPACING + CLOSE_BTN_SIZE + TAB_PAD_RIGHT;
 
         let tab_rect = Rect::from_min_size(Pos2::new(cursor_x, tab_top), Vec2::new(tab_w, tab_height));
         let text_pos = Pos2::new(tab_rect.left() + TAB_PAD_LEFT, tab_rect.center().y - text_h / 2.0);
-        let dot_pos = Pos2::new(text_pos.x + text_w + MODIFIED_DOT_GAP, tab_rect.center().y);
         let close_rect = Rect::from_center_size(
             Pos2::new(tab_rect.right() - TAB_PAD_RIGHT - CLOSE_BTN_SIZE / 2.0, tab_rect.center().y),
             Vec2::splat(CLOSE_BTN_SIZE),
         );
 
-        layouts.push(TabLayout { rect: tab_rect, close_rect, text_pos, has_dot, dot_pos, galley });
+        layouts.push(TabLayout { rect: tab_rect, close_rect, text_pos, galley });
         cursor_x = tab_rect.right();
     }
-
-    // ── 2. Compute new-tab button rect ─────────────────────────────────
-    let new_tab_rect = Rect::from_min_size(
-        Pos2::new(cursor_x + NEW_TAB_BTN_GAP, tab_top),
-        Vec2::new(NEW_TAB_BTN_WIDTH, tab_height),
-    );
 
     // ── 3. Handle interactions ─────────────────────────────────────────
     // Use explicit stable IDs for each hit-target instead of scopes,
@@ -95,6 +80,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
     let mut click_tab: Option<usize> = None;
     let mut close_tab: Option<usize> = None;
     let mut close_hovered = vec![false; state.tabs.len()];
+    let mut tab_hovered = vec![false; state.tabs.len()];
 
     for idx in 0..state.tabs.len() {
         let tab_id = egui::Id::new(("tab", idx));
@@ -104,6 +90,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         let close_resp = ui.interact(layouts[idx].close_rect, close_id, Sense::click());
 
         close_hovered[idx] = close_resp.hovered();
+        tab_hovered[idx] = tab_resp.hovered() || close_resp.hovered();
 
         if close_resp.clicked() {
             close_tab = Some(idx);
@@ -111,10 +98,6 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
             click_tab = Some(idx);
         }
     }
-
-    let new_tab_id = egui::Id::new("new_tab");
-    let new_resp = ui.interact(new_tab_rect, new_tab_id, Sense::click());
-    let new_hovered = new_resp.hovered();
 
     // ── 4. Paint ───────────────────────────────────────────────────────
     let painter = ui.painter();
@@ -151,48 +134,35 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         let text_color = if is_active { ACTIVE_TEXT } else { INACTIVE_TEXT };
         painter.galley_with_override_text_color(layout.text_pos, layout.galley.clone(), text_color);
 
-        // Modified dot (filled circle between name and close button)
-        if layout.has_dot {
-            painter.circle_filled(layout.dot_pos, MODIFIED_DOT_RADIUS, MODIFIED_DOT);
+        let is_modified = state.tabs[idx].is_modified();
+
+        if tab_hovered[idx] {
+            if close_hovered[idx] {
+                painter.rect_filled(layout.close_rect, 2, CLOSE_BG_HOVER);
+            }
+            let icon_color = if close_hovered[idx] { CLOSE_ICON_HOVER } else { CLOSE_ICON };
+            let cx = layout.close_rect.center().x;
+            let cy = layout.close_rect.center().y;
+            painter.line_segment(
+                [Pos2::new(cx - CLOSE_ICON_HALF, cy - CLOSE_ICON_HALF),
+                 Pos2::new(cx + CLOSE_ICON_HALF, cy + CLOSE_ICON_HALF)],
+                Stroke::new(CLOSE_STROKE, icon_color),
+            );
+            painter.line_segment(
+                [Pos2::new(cx + CLOSE_ICON_HALF, cy - CLOSE_ICON_HALF),
+                 Pos2::new(cx - CLOSE_ICON_HALF, cy + CLOSE_ICON_HALF)],
+                Stroke::new(CLOSE_STROKE, icon_color),
+            );
+        } else if is_modified {
+            painter.circle_filled(
+                layout.close_rect.center(),
+                MODIFIED_DOT_RADIUS,
+                MODIFIED_DOT,
+            );
         }
-
-        // Close button
-        if close_hovered[idx] {
-            painter.rect_filled(layout.close_rect, 2, CLOSE_BG_HOVER);
-        }
-        let icon_color = if close_hovered[idx] { CLOSE_ICON_HOVER } else { CLOSE_ICON };
-        let cx = layout.close_rect.center().x;
-        let cy = layout.close_rect.center().y;
-        painter.line_segment(
-            [Pos2::new(cx - CLOSE_ICON_HALF, cy - CLOSE_ICON_HALF),
-             Pos2::new(cx + CLOSE_ICON_HALF, cy + CLOSE_ICON_HALF)],
-            Stroke::new(CLOSE_STROKE, icon_color),
-        );
-        painter.line_segment(
-            [Pos2::new(cx + CLOSE_ICON_HALF, cy - CLOSE_ICON_HALF),
-             Pos2::new(cx - CLOSE_ICON_HALF, cy + CLOSE_ICON_HALF)],
-            Stroke::new(CLOSE_STROKE, icon_color),
-        );
     }
-
-    // ── New-tab (+) button ─────────────────────────────────────────────
-    if new_hovered {
-        painter.rect_filled(new_tab_rect, CornerRadius::same(4), CLOSE_BG_HOVER);
-    }
-    let cx = new_tab_rect.center().x;
-    let cy = new_tab_rect.center().y;
-    let plus_color = if new_hovered { CLOSE_ICON_HOVER } else { CLOSE_ICON };
-    painter.line_segment(
-        [Pos2::new(cx - PLUS_SIZE, cy), Pos2::new(cx + PLUS_SIZE, cy)],
-        Stroke::new(CLOSE_STROKE, plus_color),
-    );
-    painter.line_segment(
-        [Pos2::new(cx, cy - PLUS_SIZE), Pos2::new(cx, cy + PLUS_SIZE)],
-        Stroke::new(CLOSE_STROKE, plus_color),
-    );
-
     // ── 5. Deferred mutations ──────────────────────────────────────────
-    if new_resp.clicked() {
+    if strip_resp.double_clicked() {
         state.new_tab();
     }
     if let Some(idx) = close_tab {
