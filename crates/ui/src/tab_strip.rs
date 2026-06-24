@@ -131,12 +131,6 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
 
         painter.rect_filled(layout.rect, TAB_CORNER_RADIUS, bg);
 
-        painter.hline(
-            layout.rect.x_range(),
-            layout.rect.top(),
-            Stroke::new(TAB_BORDER_WIDTH, TAB_BORDER),
-        );
-
         painter.vline(
             layout.rect.left(),
             layout.rect.y_range(),
@@ -156,14 +150,6 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
 
         if layout.has_dot {
             painter.circle_filled(layout.dot_pos, TAB_MODIFIED_DOT_RADIUS, TAB_MODIFIED_DOT);
-        }
-
-        if !is_active {
-            painter.hline(
-                layout.rect.x_range(),
-                tab_bottom,
-                Stroke::new(TAB_BORDER_WIDTH, TAB_BORDER),
-            );
         }
 
         if tab_hovered[idx] {
@@ -192,6 +178,38 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
                 Stroke::new(TAB_CLOSE_STROKE, icon_color),
             );
         }
+    }
+
+    // Top border across the full strip width
+    painter.rect_filled(
+        Rect::from_min_size(
+            Pos2::new(strip_rect.left(), strip_rect.top()),
+            Vec2::new(strip_rect.width(), TAB_BORDER_WIDTH),
+        ),
+        TAB_CORNER_RADIUS,
+        TAB_BORDER,
+    );
+
+    // Bottom border across the full strip width
+    painter.rect_filled(
+        Rect::from_min_size(
+            Pos2::new(strip_rect.left(), tab_bottom - TAB_BORDER_WIDTH),
+            Vec2::new(strip_rect.width(), TAB_BORDER_WIDTH),
+        ),
+        TAB_CORNER_RADIUS,
+        TAB_BORDER,
+    );
+
+    // Cover the bottom border under the active tab so it merges with the editor
+    if let Some(active) = layouts.get(state.active_tab_index) {
+        painter.rect_filled(
+            Rect::from_min_size(
+                Pos2::new(active.rect.left(), tab_bottom - TAB_BORDER_WIDTH),
+                Vec2::new(active.rect.width(), TAB_BORDER_WIDTH),
+            ),
+            TAB_CORNER_RADIUS,
+            TAB_ACTIVE_BG,
+        );
     }
 
     if let Some(last) = layouts.last() {
