@@ -3,10 +3,10 @@ use std::sync::Arc;
 
 use eframe::egui;
 use jereide_core::{
-    char_index_to_line_col, AppState, MAIN_CORNER_RADIUS, CURRENT_LINE_BG, EDITOR_BG,
+    char_index_to_line_col, AppState, MAIN_CORNER_RADIUS, EDITOR_BG,
     EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM, EDITOR_INNER_MARGIN_LEFT_EXTRA,
     EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG,
-    GUTTER_DIGIT_WIDTH, GUTTER_HIGHLIGHT_OFFSET,
+    GUTTER_DIGIT_WIDTH,
     GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
     GUTTER_TEXT, GUTTER_TEXT_CURRENT, SCROLL_BAR_WIDTH,
 };
@@ -81,7 +81,6 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         }
     });
     let font_id = egui::FontId::monospace(EDITOR_FONT_SIZE);
-    let row_height = ui.fonts_mut(|f| f.row_height(&font_id));
     let line_count = visual_line_count(&state.tabs[active_idx].text);
     let gutter_w = gutter_width(line_count);
     let cursor_line = state.tabs[active_idx].cursor_line;
@@ -115,32 +114,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             ui.set_min_size(viewport);
 
             let widget_top = ui.cursor().min.y;
-            // Complicated painting
-            if cursor_line > 0 && cursor_line <= line_count {
-                let y = CUR_GALLEY.with(|g| {
-                    let inner_margin_top = EDITOR_INNER_MARGIN_TOP as f32;
-                    if let Some(galley) = g.borrow().as_ref() {
-                        let idx = cursor_line.saturating_sub(1);
-                        if idx < galley.rows.len() {
-                            widget_top + inner_margin_top + galley.rows[idx].pos.y
-                        } else {
-                            widget_top + inner_margin_top + idx as f32 * row_height
-                        }
-                    } else {
-                        let idx = cursor_line.saturating_sub(1);
-                        widget_top + inner_margin_top + idx as f32 * row_height
-                    }
-                });
-                let hl_x = gutter_w + GUTTER_HIGHLIGHT_OFFSET;
-                let hl_w = (viewport.x - gutter_w - GUTTER_HIGHLIGHT_OFFSET).max(0.0);
-                let painter = ui.painter();
-                // Current Line Highlighting
-                painter.rect_filled(
-                    egui::Rect::from_min_size(egui::pos2(hl_x, y), egui::vec2(hl_w, row_height)),
-                    MAIN_CORNER_RADIUS,
-                    CURRENT_LINE_BG,
-                );
-            }
+
             // The Code Editor(TextEdit::code_editor captures Tabs and keeps focus)
             let text_response = ui.add(
                 egui::TextEdit::code_editor(
