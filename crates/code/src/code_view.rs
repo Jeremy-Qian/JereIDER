@@ -5,8 +5,8 @@ use eframe::egui;
 use jereide_core::{
     char_index_to_line_col, AppState, MAIN_CORNER_RADIUS, CURRENT_LINE_BG, EDITOR_BG,
     EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM, EDITOR_INNER_MARGIN_LEFT_EXTRA,
-    EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG, GUTTER_BORDER,
-    GUTTER_BORDER_WIDTH, GUTTER_DIGIT_WIDTH, GUTTER_HIGHLIGHT_OFFSET,
+    EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG,
+    GUTTER_DIGIT_WIDTH, GUTTER_HIGHLIGHT_OFFSET,
     GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
     GUTTER_TEXT, GUTTER_TEXT_CURRENT, SCROLL_BAR_WIDTH,
 };
@@ -174,12 +174,6 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     ),
                     MAIN_CORNER_RADIUS,
                     GUTTER_BG,
-                );
-
-                painter.vline(
-                    gutter_w,
-                    gutter_y0..=gutter_y1,
-                    egui::Stroke::new(GUTTER_BORDER_WIDTH, GUTTER_BORDER),
                 );
 
                 CUR_GALLEY.with(|g| {
