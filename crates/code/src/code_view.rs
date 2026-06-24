@@ -12,15 +12,11 @@ use jereide_core::{
 };
 use jereide_syntax::SyntaxHighlighter;
 
-// A new thread for the syntax highlighting, I guess.
 thread_local! {
     static HIGHLIGHTER: RefCell<Option<SyntaxHighlighter>> = const { RefCell::new(None) };
     static PREV_EXTENSION: RefCell<Option<String>> = const { RefCell::new(None) };
-
-    static CUR_GALLEY: RefCell<Option<Arc<egui::Galley>>> = const { RefCell::new(None) };
 }
 
-// Pretty useless functions, but...
 fn visual_line_count(text: &str) -> usize {
     if text.is_empty() {
         1
@@ -48,11 +44,8 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
         s
     };
 
-    // Capture the active tab index once for direct field access (avoids
-    // borrow conflicts that helper methods would cause with the TextEdit).
     let active_idx = state.active_tab_index;
 
-    // Incremental Highlighting to make JereIDE faster
     let extension = state.tabs[active_idx]
         .file_path
         .as_ref()
@@ -80,10 +73,13 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             *hl.borrow_mut() = Some(SyntaxHighlighter::new(EDITOR_FONT_SIZE, extension));
         }
     });
+
     let font_id = egui::FontId::monospace(EDITOR_FONT_SIZE);
     let line_count = visual_line_count(&state.tabs[active_idx].text);
     let gutter_w = gutter_width(line_count);
     let cursor_line = state.tabs[active_idx].cursor_line;
+
+    let last_galley: RefCell<Option<Arc<egui::Galley>>> = RefCell::new(None);
 
     let mut layouter =
         |layouter_ui: &egui::Ui, text: &dyn egui::widgets::TextBuffer, wrap_width: f32| {
@@ -98,15 +94,10 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
 
             layout_job.wrap.max_width = wrap_width;
             let galley = layouter_ui.fonts_mut(|f| f.layout_job(layout_job));
-
-            CUR_GALLEY.with(|g| {
-                *g.borrow_mut() = Some(galley.clone());
-            });
-
+            *last_galley.borrow_mut() = Some(galley.clone());
             galley
         };
-    // Scrolling both ways
-    // TODO: Add option for wrap instead of horizontal scroll
+
     let response = egui::ScrollArea::both()
         .auto_shrink(false)
         .show(ui, |ui| {
@@ -115,63 +106,68 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
 
             let widget_top = ui.cursor().min.y;
 
-            // The Code Editor(TextEdit::code_editor captures Tabs and keeps focus)
-            let text_response = ui.add(
-                egui::TextEdit::code_editor(
-                    egui::TextEdit::multiline(&mut state.tabs[active_idx].text),
-                )
-                .id_source("editor")
-                .desired_width(viewport.x)
-                .frame(egui::Frame {
-                    inner_margin: egui::Margin {
-                        left: (gutter_w + EDITOR_INNER_MARGIN_LEFT_EXTRA as f32) as i8,
-                        right: EDITOR_INNER_MARGIN_RIGHT,
-                        top: EDITOR_INNER_MARGIN_TOP,
-                        bottom: EDITOR_INNER_MARGIN_BOTTOM,
-                    },
-                    ..egui::Frame::NONE
-                })
-                .layouter(&mut layouter),
-            );
-
-            let text_alloc = text_response.rect;
-            let gutter_y0 = text_alloc.top();
-            let gutter_y1 = text_alloc.bottom().max(ui.clip_rect().bottom());
-
-            {
-                let painter = ui.painter();
-
-                painter.rect_filled(
-                    egui::Rect::from_min_size(
-                        egui::pos2(0.0, gutter_y0),
-                        egui::vec2(gutter_w, gutter_y1 - gutter_y0),
-                    ),
-                    MAIN_CORNER_RADIUS,
-                    GUTTER_BG,
+            let horiz = ui.horizontal_top(|ui| {
+                let (gutter_rect, _) = ui.allocate_exact_size(
+                    egui::vec2(gutter_w, viewport.y),
+                    egui::Sense::hover(),
                 );
 
-                CUR_GALLEY.with(|g| {
-                    if let Some(galley) = g.borrow().as_ref() {
-                        for (i, row) in galley.rows.iter().enumerate() {
-                            let line_num = i + 1;
-                            let y = widget_top + EDITOR_INNER_MARGIN_TOP as f32 + row.pos.y;
-                            let is_current = line_num == cursor_line;
-                            let color = if is_current {
-                                GUTTER_TEXT_CURRENT
-                            } else {
-                                GUTTER_TEXT
-                            };
-                            painter.text(
-                                egui::pos2(gutter_w - GUTTER_LINE_NUMBER_RIGHT_OFFSET, y),
-                                egui::Align2::RIGHT_TOP,
-                                line_num.to_string(),
-                                font_id.clone(),
-                                color,
-                            );
-                        }
-                    }
-                });
+                let text_response = ui.add(
+                    egui::TextEdit::code_editor(
+                        egui::TextEdit::multiline(&mut state.tabs[active_idx].text),
+                    )
+                    .id_source("editor")
+                    .desired_width(viewport.x - gutter_w)
+                    .frame(egui::Frame {
+                        inner_margin: egui::Margin {
+                            left: EDITOR_INNER_MARGIN_LEFT_EXTRA,
+                            right: EDITOR_INNER_MARGIN_RIGHT,
+                            top: EDITOR_INNER_MARGIN_TOP,
+                            bottom: EDITOR_INNER_MARGIN_BOTTOM,
+                        },
+                        ..egui::Frame::NONE
+                    })
+                    .layouter(&mut layouter),
+                );
+
+                (gutter_rect, text_response)
+            });
+
+            let (gutter_rect, text_response) = horiz.inner;
+            let text_alloc = text_response.rect;
+
+            let g_bottom = text_alloc.bottom().max(ui.clip_rect().bottom());
+            let painter = ui.painter();
+            painter.rect_filled(
+                egui::Rect::from_min_size(
+                    egui::pos2(gutter_rect.left(), gutter_rect.top()),
+                    egui::vec2(gutter_w, g_bottom - gutter_rect.top()),
+                ),
+                MAIN_CORNER_RADIUS,
+                GUTTER_BG,
+            );
+
+            let line_start_y = widget_top + EDITOR_INNER_MARGIN_TOP as f32;
+            if let Some(galley) = last_galley.borrow().as_ref() {
+                for (i, row) in galley.rows.iter().enumerate() {
+                    let line_y = line_start_y + row.pos.y;
+                    let line_num = i + 1;
+                    let is_current = line_num == cursor_line;
+                    let color = if is_current {
+                        GUTTER_TEXT_CURRENT
+                    } else {
+                        GUTTER_TEXT
+                    };
+                    painter.text(
+                        egui::pos2(gutter_w - GUTTER_LINE_NUMBER_RIGHT_OFFSET, line_y),
+                        egui::Align2::RIGHT_TOP,
+                        line_num.to_string(),
+                        font_id.clone(),
+                        color,
+                    );
+                }
             }
+
             // Fill up the whole Y available space
             let remaining = ui.available_size();
             if remaining.y > 0.0 {
