@@ -74,6 +74,8 @@ pub struct AppState {
     /// spamming AppKit on every frame (which triggers unwanted title-bar
     /// re-layout and resets the traffic light positions).
     pub document_edited: bool,
+    /// Used to detect window resize so we re-position traffic lights.
+    pub last_window_size: Option<egui::Rect>,
 }
 
 /// Another new method.
@@ -88,6 +90,7 @@ impl AppState {
             traffic_lights_positioned: false,
             was_fullscreen: false,
             document_edited: false,
+            last_window_size: None,
         }
     }
 

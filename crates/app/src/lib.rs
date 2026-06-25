@@ -83,6 +83,14 @@ impl eframe::App for JereIDEApp {
             }
 
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
+
+            // Detect resize – AppKit resets traffic light positions on resize.
+            let current_inner = ctx.input(|i| i.viewport().inner_rect);
+            if self.state.last_window_size != current_inner {
+                self.state.traffic_lights_positioned = false;
+                self.state.last_window_size = current_inner;
+            }
+
             if self.state.was_fullscreen != is_fullscreen || !self.state.traffic_lights_positioned {
                 // Position the traffic lights like how Zed does it
                 jereide_window::position_traffic_lights(frame, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y);
