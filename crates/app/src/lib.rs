@@ -79,23 +79,15 @@ impl eframe::App for JereIDEApp {
             if is_modified != self.state.document_edited {
                 self.state.document_edited = is_modified;
                 jereide_window::set_document_edited(frame, is_modified);
-                self.state.traffic_lights_positioned = false;
             }
 
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
 
-            // Detect resize – AppKit resets traffic light positions on resize.
-            let current_inner = ctx.input(|i| i.viewport().inner_rect);
-            if self.state.last_window_size != current_inner {
-                self.state.traffic_lights_positioned = false;
-                self.state.last_window_size = current_inner;
-            }
+            // Position every frame. The underlying function captures default
+            // button positions once and computes absolute targets, so calling
+            // it repeatedly is idempotent — no drift.
+            jereide_window::position_traffic_lights(frame, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y);
 
-            if self.state.was_fullscreen != is_fullscreen || !self.state.traffic_lights_positioned {
-                // Position the traffic lights like how Zed does it
-                jereide_window::position_traffic_lights(frame, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y);
-                self.state.traffic_lights_positioned = true;
-            }
             self.state.was_fullscreen = is_fullscreen;
         }
 

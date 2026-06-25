@@ -68,14 +68,8 @@ pub struct AppState {
     pub editor_focused: bool,
     pub editor_id: egui::Id,
     pub current_view: CurrentView,
-    pub traffic_lights_positioned: bool,
     pub was_fullscreen: bool,
-    /// Tracks the last value sent to `setDocumentEdited:` so we avoid
-    /// spamming AppKit on every frame (which triggers unwanted title-bar
-    /// re-layout and resets the traffic light positions).
     pub document_edited: bool,
-    /// Used to detect window resize so we re-position traffic lights.
-    pub last_window_size: Option<egui::Rect>,
 }
 
 /// Another new method.
@@ -87,10 +81,8 @@ impl AppState {
             editor_focused: false,
             editor_id: egui::Id::new("editor"),
             current_view: CurrentView::Code,
-            traffic_lights_positioned: false,
             was_fullscreen: false,
             document_edited: false,
-            last_window_size: None,
         }
     }
 
