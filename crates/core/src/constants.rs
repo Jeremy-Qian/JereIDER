@@ -15,9 +15,9 @@ pub const COMMAND_VIEW_BG: Color32 = Color32::from_gray(20);
 pub const COMMAND_VIEW_TEXT: Color32 = Color32::from_gray(250);
 pub const STATUS_BAR_BG: Color32 = Color32::WHITE;
 
-pub const TAB_STRIP_BG: Color32 = Color32::from_rgb(215, 215, 215);
+pub const TAB_STRIP_BG: Color32 = Color32::from_rgb(245, 245, 245);
 pub const TAB_ACTIVE_BG: Color32 = Color32::from_rgb(255, 255, 255);
-pub const TAB_INACTIVE_BG: Color32 = Color32::from_rgb(238, 238, 238);
+pub const TAB_INACTIVE_BG: Color32 = Color32::from_rgb(245, 245, 245);
 pub const TAB_ACTIVE_TEXT: Color32 = Color32::from_rgb(30, 30, 30);
 pub const TAB_INACTIVE_TEXT: Color32 = Color32::from_rgb(130, 130, 130);
 pub const TAB_BORDER: Color32 = Color32::from_rgb(200, 200, 200);
