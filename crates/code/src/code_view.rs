@@ -39,7 +39,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
     style.visuals.widgets.hovered.bg_stroke = egui::Stroke::NONE;
     style.visuals.widgets.active.bg_stroke = egui::Stroke::NONE;
     style.spacing.scroll = {
-        let mut s = egui::style::ScrollStyle::solid();
+        let mut s = egui::style::ScrollStyle::floating();
         s.bar_width = SCROLL_BAR_WIDTH;
         s
     };
