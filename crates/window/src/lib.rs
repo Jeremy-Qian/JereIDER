@@ -1,6 +1,4 @@
-/// Sets the document-edited state on the native macOS window.
-/// When `edited` is `true`, a small dark dot appears inside the red close button,
-/// indicating unsaved changes — just like Notes, TextEdit, and every other native app.
+
 #[cfg(target_os = "macos")]
 pub fn set_document_edited(frame: &eframe::Frame, edited: bool) {
     use objc2::msg_send;

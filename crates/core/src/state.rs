@@ -10,7 +10,7 @@ pub enum CurrentView {
 #[derive(Clone)]
 pub struct Tab {
     pub text: String,
-    /// Snapshot of `text` at the time of the last New/Open/Save/SaveAs.
+
     pub saved_text: String,
     pub file_path: Option<String>,
     pub cursor_line: usize,
@@ -38,12 +38,12 @@ impl Tab {
         }
     }
 
-    /// Returns `true` if the text differs from the last saved state.
+
     pub fn is_modified(&self) -> bool {
         self.text != self.saved_text
     }
 
-    /// Marks the current text as "saved" (clears modified state).
+
     pub fn mark_saved(&mut self) {
         self.saved_text = self.text.clone();
     }
@@ -63,7 +63,7 @@ impl Tab {
 pub struct AppState {
     /// All open documents.
     pub tabs: Vec<Tab>,
-    /// Index into `tabs` of the currently visible tab.
+
     pub active_tab_index: usize,
     pub editor_focused: bool,
     pub editor_id: egui::Id,
@@ -96,7 +96,7 @@ impl AppState {
         &mut self.tabs[self.active_tab_index]
     }
 
-    /// Returns `true` if the active tab's text differs from its last saved state.
+
     pub fn is_modified(&self) -> bool {
         self.current_tab().is_modified()
     }
@@ -106,8 +106,7 @@ impl AppState {
         self.current_tab_mut().mark_saved();
     }
 
-    /// Opens a file in a new tab (or switches to it if already open).
-    /// Returns the index of the tab.
+
     pub fn open_file(&mut self, path: String, content: String) -> usize {
         // Check if this file is already open
         for (i, tab) in self.tabs.iter().enumerate() {
@@ -132,8 +131,7 @@ impl AppState {
         idx
     }
 
-    /// Removes the tab at `index`. If it was the active tab, selects a neighbour.
-    /// Will not remove the last remaining tab.
+
     pub fn close_tab(&mut self, index: usize) {
         if self.tabs.len() <= 1 {
             return;

@@ -9,8 +9,7 @@ use jereide_core::{
     TAB_MODIFIED_DOT_RADIUS, TAB_PAD_LEFT, TAB_PAD_RIGHT, TAB_STRIP_BG, TAB_STRIP_HEIGHT,
 };
 
-/// Pre-computed data for each tab so we don't re-measure or re-compute
-/// during the paint phase.
+
 struct TabLayout {
     rect: Rect,
     close_rect: Rect,

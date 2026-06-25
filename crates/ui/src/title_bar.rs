@@ -47,8 +47,7 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
                 state.switch_to_view(CurrentView::Command);
             }
 
-            // Filename is now shown in the tab strip below.
-            // Keep the right side clean for future toolbar items.
+
             ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |_ui| {
                 // Reserved for future right-side title bar content.
             });

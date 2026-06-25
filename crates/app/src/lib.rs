@@ -83,9 +83,7 @@ impl eframe::App for JereIDEApp {
 
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
 
-            // Position every frame. The underlying function captures default
-            // button positions once and computes absolute targets, so calling
-            // it repeatedly is idempotent — no drift.
+
             jereide_window::position_traffic_lights(frame, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y);
 
             self.state.was_fullscreen = is_fullscreen;
@@ -128,7 +126,7 @@ impl eframe::App for JereIDEApp {
                 let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                 jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
 
-                // Tab strip sits between the title bar and the editor.
+
                 jereide_ui::tab_strip::render_tab_strip(state, ui);
 
                 let content_rect = ui.available_rect_before_wrap();
