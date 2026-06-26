@@ -130,12 +130,6 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
 
         painter.rect_filled(layout.rect, TAB_CORNER_RADIUS, bg);
 
-        painter.vline(
-            layout.rect.left(),
-            layout.rect.y_range(),
-            Stroke::new(TAB_BORDER_WIDTH, TAB_BORDER),
-        );
-
         let text_color = if is_active {
             TAB_ACTIVE_TEXT
         } else {
@@ -211,6 +205,15 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         );
     }
 
+    // Draw all vlines last so they render on top of the cover rect,
+    // ensuring the vertical lines extend cleanly to the bottom corners.
+    for idx in 0..state.tabs.len() {
+        painter.vline(
+            layouts[idx].rect.left(),
+            layouts[idx].rect.y_range(),
+            Stroke::new(TAB_BORDER_WIDTH, TAB_BORDER),
+        );
+    }
     if let Some(last) = layouts.last() {
         painter.vline(
             last.rect.right(),
