@@ -29,14 +29,5 @@ impl FileManager {
         std::fs::write(path, content)
     }
 
-    /// Returns display name, like main.rs instead of user/project/main.rs
-    pub fn display_name(&self) -> String {
-        self.current_path
-            .as_ref()
-            .and_then(|p| p.file_name())
-            .and_then(|n| n.to_str())
-            .map(|s| s.to_string())
-            // Or returns Untitled
-            .unwrap_or_else(|| "Untitled".to_string())
-    }
+
 }

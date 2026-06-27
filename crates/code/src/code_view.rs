@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use eframe::egui;
 use jereide_core::{
-    char_index_to_line_col, AppState, MAIN_CORNER_RADIUS, EDITOR_BG,
+    char_index_to_line_col, AppState, EDITOR_BG,
     EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM, EDITOR_INNER_MARGIN_LEFT_EXTRA,
     EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG,
     GUTTER_DIGIT_WIDTH,
@@ -143,7 +143,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     egui::pos2(gutter_rect.left(), gutter_rect.top()),
                     egui::vec2(gutter_w, g_bottom - gutter_rect.top()),
                 ),
-                MAIN_CORNER_RADIUS,
+                0.0,
                 GUTTER_BG,
             );
 
