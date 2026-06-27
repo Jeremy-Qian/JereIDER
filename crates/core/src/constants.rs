@@ -48,7 +48,6 @@ pub const STATUS_BAR_MARGIN: Margin = Margin::symmetric(8, 4);
 pub const TAB_TOP_MARGIN: f32 = 0.0;
 pub const TAB_PAD_LEFT: f32 = 8.0;
 pub const TAB_PAD_RIGHT: f32 = 8.0;
-pub const TAB_CORNER_RADIUS: u8 = 0;
 pub const TAB_CLOSE_BTN_SIZE: f32 = 18.0;
 pub const TAB_CLOSE_BTN_RADIUS: u8 = 3;
 pub const TAB_CLOSE_BTN_SPACING: f32 = 6.0;
