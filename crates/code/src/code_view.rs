@@ -107,9 +107,9 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             let widget_top = ui.cursor().min.y;
 
             let horiz = ui.horizontal_top(|ui| {
-                let (gutter_rect, _) = ui.allocate_exact_size(
-                    egui::vec2(gutter_w, viewport.y),
-                    egui::Sense::hover(),
+                let (gutter_rect, gutter_resp) = ui.allocate_exact_size(
+                    egui::vec2(gutter_w, 0.0),
+                    egui::Sense::click(),
                 );
 
                 let text_response = ui.add(
@@ -130,10 +130,10 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     .layouter(&mut layouter),
                 );
 
-                (gutter_rect, text_response)
+                (gutter_rect, gutter_resp, text_response)
             });
 
-            let (gutter_rect, text_response) = horiz.inner;
+            let (gutter_rect, gutter_resp, text_response) = horiz.inner;
             let text_alloc = text_response.rect;
 
             let g_bottom = text_alloc.bottom().max(ui.clip_rect().bottom());
@@ -172,11 +172,12 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             let remaining = ui.available_size();
             if remaining.y > 0.0 {
                 let (_, bg) = ui.allocate_exact_size(remaining, egui::Sense::click());
-                if bg.clicked() {
+                if bg.clicked() || gutter_resp.clicked() {
                     text_response.request_focus();
                 }
                 bg.on_hover_cursor(egui::CursorIcon::Text);
             }
+            gutter_resp.on_hover_cursor(egui::CursorIcon::Text);
 
             text_response
         })
