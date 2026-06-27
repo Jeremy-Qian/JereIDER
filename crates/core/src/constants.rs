@@ -1,6 +1,9 @@
 //! Central constants for JereIDE.
 //!
 //! Includes stuff like colors, dimensions, and other constants.
+// TODO: Change all of these to variables soon
+// TODO: Load all of these from a settings.json or something
+// like that at runtime instead of hardcoding them.
 
 use eframe::egui::{Color32, Margin};
 
@@ -20,7 +23,7 @@ pub const TAB_INACTIVE_BG: Color32 = Color32::from_rgb(245, 245, 245);
 pub const TAB_ACTIVE_TEXT: Color32 = Color32::from_rgb(30, 30, 30);
 pub const TAB_INACTIVE_TEXT: Color32 = Color32::from_rgb(130, 130, 130);
 pub const TAB_BORDER: Color32 = Color32::from_rgb(200, 200, 200);
-pub const TAB_CLOSE_BG_HOVER: Color32 = Color32::from_rgb(196, 196, 196);
+pub const TAB_CLOSE_BG_HOVER: Color32 = Color32::from_rgb(230, 230, 230);
 pub const TAB_CLOSE_ICON: Color32 = Color32::from_rgb(30, 30, 30);
 pub const TAB_CLOSE_ICON_HOVER: Color32 = Color32::BLACK;
 pub const TAB_MODIFIED_DOT: Color32 = Color32::from_rgb(9, 105, 218);
