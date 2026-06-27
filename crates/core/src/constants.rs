@@ -51,7 +51,6 @@ pub const TAB_CLOSE_BTN_SPACING: f32 = 6.0;
 pub const TAB_CLOSE_ICON_HALF: f32 = 3.0;
 pub const TAB_CLOSE_STROKE: f32 = 0.9;
 pub const TAB_MODIFIED_DOT_RADIUS: f32 = 3.0;
-pub const TAB_MODIFIED_DOT_GAP: f32 = 6.0;
 pub const TAB_BORDER_WIDTH: f32 = 1.0;
 pub const TAB_FONT_SIZE: f32 = 12.0;
 

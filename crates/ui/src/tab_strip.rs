@@ -5,8 +5,8 @@ use jereide_core::{
     AppState, TAB_ACTIVE_BG, TAB_ACTIVE_TEXT, TAB_BORDER, TAB_BORDER_WIDTH, TAB_CLOSE_BG_HOVER,
     TAB_CLOSE_BTN_RADIUS, TAB_CLOSE_BTN_SIZE, TAB_CLOSE_BTN_SPACING, TAB_CLOSE_ICON,
     TAB_CLOSE_ICON_HALF, TAB_CLOSE_ICON_HOVER, TAB_CLOSE_STROKE, TAB_FONT_SIZE,
-    TAB_INACTIVE_BG, TAB_INACTIVE_TEXT, TAB_MODIFIED_DOT, TAB_MODIFIED_DOT_GAP,
-    TAB_MODIFIED_DOT_RADIUS, TAB_PAD_LEFT, TAB_PAD_RIGHT, TAB_STRIP_BG, TAB_STRIP_HEIGHT,
+    TAB_INACTIVE_BG, TAB_INACTIVE_TEXT, TAB_MODIFIED_DOT, TAB_MODIFIED_DOT_RADIUS,
+    TAB_PAD_LEFT, TAB_PAD_RIGHT, TAB_STRIP_BG, TAB_STRIP_HEIGHT,
 };
 
 
@@ -49,7 +49,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
 
         let has_dot = tab.is_modified();
         let dot_extra = if has_dot {
-            TAB_MODIFIED_DOT_RADIUS * 2.0 + TAB_MODIFIED_DOT_GAP
+            TAB_MODIFIED_DOT_RADIUS * 2.0
         } else {
             0.0
         };
@@ -70,7 +70,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         );
 
         let dot_pos = Pos2::new(
-            tab_rect.left() + TAB_PAD_LEFT + TAB_MODIFIED_DOT_RADIUS,
+            tab_rect.left() + side / 2.0,
             tab_rect.center().y,
         );
 
