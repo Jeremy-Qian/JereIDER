@@ -10,8 +10,24 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  fmt:
+    name: Check formatting
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: rustfmt
+
+    - name: Check formatting
+      run: cargo fmt --check
+
   test:
-    name: Run all tests
+    name: Run tests
     runs-on: macos-latest
 
     steps:
@@ -26,3 +42,11 @@ jobs:
 
     - name: Run tests
       run: cargo test
+
+  all:
+    name: Run all tests
+    needs: [fmt, test]
+    runs-on: macos-latest
+
+    steps:
+    - run: echo "All checks passed"
