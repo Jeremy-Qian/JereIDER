@@ -44,9 +44,14 @@ jobs:
       run: cargo test
 
   all:
-    name: Run all tests
+    name: All Checks Pass
+    if: always()
     needs: [fmt, test]
     runs-on: macos-latest
 
     steps:
-    - run: echo "All checks passed"
+    - run: |
+        echo "fmt: ${{ needs.fmt.result }}"
+        echo "test: ${{ needs.test.result }}"
+        test "${{ needs.fmt.result }}" = "success"
+        test "${{ needs.test.result }}" = "success"
