@@ -179,8 +179,10 @@ fn tab_file_name_no_extension() {
 
 #[test]
 fn tab_file_name_deep_path() {
-    let tab =
-        Tab::with_path_and_content("/a/very/deep/nested/directory/file.rs".into(), String::new());
+    let tab = Tab::with_path_and_content(
+        "/a/very/deep/nested/directory/file.rs".into(),
+        String::new(),
+    );
     assert_eq!(tab.file_name(), "file.rs");
 }
 

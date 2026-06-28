@@ -83,8 +83,11 @@ impl eframe::App for JereIDEApp {
 
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
 
-
-            jereide_window::position_traffic_lights(frame, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y);
+            jereide_window::position_traffic_lights(
+                frame,
+                TRAFFIC_LIGHT_OFFSET_X,
+                TRAFFIC_LIGHT_OFFSET_Y,
+            );
 
             self.state.was_fullscreen = is_fullscreen;
         }
@@ -125,7 +128,6 @@ impl eframe::App for JereIDEApp {
 
                 let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                 jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
-
 
                 jereide_ui::tab_strip::render_tab_strip(state, ui);
 

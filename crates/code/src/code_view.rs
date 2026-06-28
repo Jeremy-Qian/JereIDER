@@ -3,11 +3,9 @@ use std::sync::Arc;
 
 use eframe::egui;
 use jereide_core::{
-    char_index_to_line_col, AppState, EDITOR_BG,
-    EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM, EDITOR_INNER_MARGIN_LEFT_EXTRA,
-    EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG,
-    GUTTER_DIGIT_WIDTH,
-    GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
+    char_index_to_line_col, AppState, EDITOR_BG, EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM,
+    EDITOR_INNER_MARGIN_LEFT_EXTRA, EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG,
+    GUTTER_DIGIT_WIDTH, GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
     GUTTER_TEXT, GUTTER_TEXT_CURRENT, SCROLL_BAR_WIDTH,
 };
 use jereide_syntax::SyntaxHighlighter;
@@ -107,15 +105,13 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
             let widget_top = ui.cursor().min.y;
 
             let horiz = ui.horizontal_top(|ui| {
-                let (gutter_rect, gutter_resp) = ui.allocate_exact_size(
-                    egui::vec2(gutter_w, 0.0),
-                    egui::Sense::click(),
-                );
+                let (gutter_rect, gutter_resp) =
+                    ui.allocate_exact_size(egui::vec2(gutter_w, 0.0), egui::Sense::click());
 
                 let text_response = ui.add(
-                    egui::TextEdit::code_editor(
-                        egui::TextEdit::multiline(&mut state.tabs[active_idx].text),
-                    )
+                    egui::TextEdit::code_editor(egui::TextEdit::multiline(
+                        &mut state.tabs[active_idx].text,
+                    ))
                     .id_source("editor")
                     .desired_width(viewport.x - gutter_w)
                     .frame(egui::Frame {
@@ -195,58 +191,58 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
 
     if !state.editor_focused {
         state.editor_focused = true;
-            response.request_focus();
-        }
+        response.request_focus();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn visual_line_count_empty() {
+        assert_eq!(visual_line_count(""), 1);
     }
 
-    #[cfg(test)]
-    mod tests {
-        use super::*;
-
-        #[test]
-        fn visual_line_count_empty() {
-            assert_eq!(visual_line_count(""), 1);
-        }
-
-        #[test]
-        fn visual_line_count_single_line() {
-            assert_eq!(visual_line_count("hello"), 1);
-        }
-
-        #[test]
-        fn visual_line_count_multi_line() {
-            assert_eq!(visual_line_count("line1\nline2\nline3"), 3);
-        }
-
-        #[test]
-        fn visual_line_count_trailing_newline() {
-            assert_eq!(visual_line_count("line1\nline2\n"), 3);
-        }
-
-        #[test]
-        fn gutter_width_single_digit() {
-            let w = gutter_width(5);
-            assert!(w.is_finite() && w > 0.0);
-        }
-
-        #[test]
-        fn gutter_width_double_digit() {
-            let w_single = gutter_width(5);
-            let w_double = gutter_width(50);
-            assert!(w_double > w_single);
-        }
-
-        #[test]
-        fn gutter_width_triple_digit() {
-            let w_double = gutter_width(50);
-            let w_triple = gutter_width(500);
-            assert!(w_triple > w_double);
-        }
-
-        #[test]
-        fn gutter_width_exact_powers_of_ten() {
-            let w_9 = gutter_width(9);
-            let w_10 = gutter_width(10);
-            assert!(w_10 > w_9);
-        }
+    #[test]
+    fn visual_line_count_single_line() {
+        assert_eq!(visual_line_count("hello"), 1);
     }
+
+    #[test]
+    fn visual_line_count_multi_line() {
+        assert_eq!(visual_line_count("line1\nline2\nline3"), 3);
+    }
+
+    #[test]
+    fn visual_line_count_trailing_newline() {
+        assert_eq!(visual_line_count("line1\nline2\n"), 3);
+    }
+
+    #[test]
+    fn gutter_width_single_digit() {
+        let w = gutter_width(5);
+        assert!(w.is_finite() && w > 0.0);
+    }
+
+    #[test]
+    fn gutter_width_double_digit() {
+        let w_single = gutter_width(5);
+        let w_double = gutter_width(50);
+        assert!(w_double > w_single);
+    }
+
+    #[test]
+    fn gutter_width_triple_digit() {
+        let w_double = gutter_width(50);
+        let w_triple = gutter_width(500);
+        assert!(w_triple > w_double);
+    }
+
+    #[test]
+    fn gutter_width_exact_powers_of_ten() {
+        let w_9 = gutter_width(9);
+        let w_10 = gutter_width(10);
+        assert!(w_10 > w_9);
+    }
+}

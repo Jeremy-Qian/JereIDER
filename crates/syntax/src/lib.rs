@@ -54,7 +54,7 @@ impl SyntaxHighlighter {
             .themes
             .get("InspiredGitHub")
             .unwrap_or_else(|| &ts.themes["base16-ocean.light"]);
-        
+
         // Monospace font, of course.
         Self {
             font_id: FontId::monospace(font_size),
@@ -64,7 +64,7 @@ impl SyntaxHighlighter {
             cached_text: String::new(),
         }
     }
-    
+
     /// Highlights.
     pub fn highlight(&mut self, text: &str) -> egui::text::LayoutJob {
         if text.is_empty() {
@@ -72,7 +72,7 @@ impl SyntaxHighlighter {
             self.cached_text.clear();
             return egui::text::LayoutJob::default();
         }
-        
+
         // If text didn't change, no need to
         // waste compute.
         if text == self.cached_text {
@@ -83,7 +83,7 @@ impl SyntaxHighlighter {
 
         let ss = syntax_set();
         let new_lines: Vec<&str> = LinesWithEndings::from(text).collect();
-            
+
         // Incremental stuff
         let first_diff = self
             .lines

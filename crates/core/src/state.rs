@@ -38,11 +38,9 @@ impl Tab {
         }
     }
 
-
     pub fn is_modified(&self) -> bool {
         self.text != self.saved_text
     }
-
 
     pub fn mark_saved(&mut self) {
         self.saved_text = self.text.clone();
@@ -96,7 +94,6 @@ impl AppState {
         &mut self.tabs[self.active_tab_index]
     }
 
-
     pub fn is_modified(&self) -> bool {
         self.current_tab().is_modified()
     }
@@ -105,7 +102,6 @@ impl AppState {
     pub fn mark_saved(&mut self) {
         self.current_tab_mut().mark_saved();
     }
-
 
     pub fn open_file(&mut self, path: String, content: String) -> usize {
         // Check if this file is already open
@@ -130,7 +126,6 @@ impl AppState {
         self.active_tab_index = idx;
         idx
     }
-
 
     pub fn close_tab(&mut self, index: usize) {
         if self.tabs.len() <= 1 {

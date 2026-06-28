@@ -28,6 +28,4 @@ impl FileManager {
         // TODO: Add proper error handling
         std::fs::write(path, content)
     }
-
-
 }

@@ -4,11 +4,10 @@ use eframe::egui::{self, Color32, FontId, Pos2, Rect, Sense, Stroke, Vec2};
 use jereide_core::{
     AppState, TAB_ACTIVE_BG, TAB_ACTIVE_TEXT, TAB_BORDER, TAB_BORDER_WIDTH, TAB_CLOSE_BG_HOVER,
     TAB_CLOSE_BTN_RADIUS, TAB_CLOSE_BTN_SIZE, TAB_CLOSE_BTN_SPACING, TAB_CLOSE_ICON,
-    TAB_CLOSE_ICON_HALF, TAB_CLOSE_ICON_HOVER, TAB_CLOSE_STROKE, TAB_FONT_SIZE,
-    TAB_INACTIVE_BG, TAB_INACTIVE_TEXT, TAB_MODIFIED_DOT, TAB_MODIFIED_DOT_RADIUS,
-    TAB_PAD_LEFT, TAB_PAD_RIGHT, TAB_STRIP_BG, TAB_STRIP_HEIGHT,
+    TAB_CLOSE_ICON_HALF, TAB_CLOSE_ICON_HOVER, TAB_CLOSE_STROKE, TAB_FONT_SIZE, TAB_INACTIVE_BG,
+    TAB_INACTIVE_TEXT, TAB_MODIFIED_DOT, TAB_MODIFIED_DOT_RADIUS, TAB_PAD_LEFT, TAB_PAD_RIGHT,
+    TAB_STRIP_BG, TAB_STRIP_HEIGHT,
 };
-
 
 struct TabLayout {
     rect: Rect,
@@ -21,10 +20,8 @@ struct TabLayout {
 
 pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
     let available = ui.available_size();
-    let (strip_rect, strip_resp) = ui.allocate_exact_size(
-        Vec2::new(available.x, TAB_STRIP_HEIGHT),
-        Sense::click(),
-    );
+    let (strip_rect, strip_resp) =
+        ui.allocate_exact_size(Vec2::new(available.x, TAB_STRIP_HEIGHT), Sense::click());
     let tab_bottom = strip_rect.bottom();
     let tab_top = strip_rect.top();
 
@@ -69,10 +66,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
             tab_rect.center().y - text_h / 2.0,
         );
 
-        let dot_pos = Pos2::new(
-            tab_rect.left() + side / 2.0,
-            tab_rect.center().y,
-        );
+        let dot_pos = Pos2::new(tab_rect.left() + side / 2.0, tab_rect.center().y);
 
         let close_rect = Rect::from_center_size(
             Pos2::new(
@@ -135,11 +129,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         } else {
             TAB_INACTIVE_TEXT
         };
-        painter.galley_with_override_text_color(
-            layout.text_pos,
-            layout.galley.clone(),
-            text_color,
-        );
+        painter.galley_with_override_text_color(layout.text_pos, layout.galley.clone(), text_color);
 
         if layout.has_dot {
             painter.circle_filled(layout.dot_pos, TAB_MODIFIED_DOT_RADIUS, TAB_MODIFIED_DOT);
