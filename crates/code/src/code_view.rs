@@ -195,6 +195,58 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
 
     if !state.editor_focused {
         state.editor_focused = true;
-        response.request_focus();
+            response.request_focus();
+        }
     }
-}
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn visual_line_count_empty() {
+            assert_eq!(visual_line_count(""), 1);
+        }
+
+        #[test]
+        fn visual_line_count_single_line() {
+            assert_eq!(visual_line_count("hello"), 1);
+        }
+
+        #[test]
+        fn visual_line_count_multi_line() {
+            assert_eq!(visual_line_count("line1\nline2\nline3"), 3);
+        }
+
+        #[test]
+        fn visual_line_count_trailing_newline() {
+            assert_eq!(visual_line_count("line1\nline2\n"), 3);
+        }
+
+        #[test]
+        fn gutter_width_single_digit() {
+            let w = gutter_width(5);
+            assert!(w.is_finite() && w > 0.0);
+        }
+
+        #[test]
+        fn gutter_width_double_digit() {
+            let w_single = gutter_width(5);
+            let w_double = gutter_width(50);
+            assert!(w_double > w_single);
+        }
+
+        #[test]
+        fn gutter_width_triple_digit() {
+            let w_double = gutter_width(50);
+            let w_triple = gutter_width(500);
+            assert!(w_triple > w_double);
+        }
+
+        #[test]
+        fn gutter_width_exact_powers_of_ten() {
+            let w_9 = gutter_width(9);
+            let w_10 = gutter_width(10);
+            assert!(w_10 > w_9);
+        }
+    }
