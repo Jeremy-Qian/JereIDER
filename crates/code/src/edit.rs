@@ -1,5 +1,5 @@
 use eframe::egui;
-use jereide_core::{char_range_substring, delete_char_range, insert_at_char_index, AppState};
+use jereide_core::{char_range_substring, delete_char_range, AppState};
 
 /// Type-safe edit actions that the menu system can dispatch to the editor.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -88,51 +88,10 @@ fn action_cut(state: &mut AppState, ctx: &egui::Context) {
     }
 }
 
-/// Returns the current clipboard text, reusing a single cached clipboard instance.
-fn clipboard_text() -> String {
-    use std::sync::Mutex;
-    static CLIPBOARD: std::sync::OnceLock<Mutex<arboard::Clipboard>> =
-        std::sync::OnceLock::new();
-    CLIPBOARD
-        .get_or_init(|| {
-            Mutex::new(
-                arboard::Clipboard::new()
-                    .expect("failed to initialize system clipboard"),
-            )
-        })
-        .lock()
-        .ok()
-        .and_then(|mut cb| cb.get_text().ok())
-        .unwrap_or_default()
-}
-
-/// Pastes from the clipboard.
-fn action_paste(state: &mut AppState, ctx: &egui::Context) {
-    let clipboard = clipboard_text();
-    if clipboard.is_empty() {
-        return;
-    }
-    if let Some(mut edit_state) = egui::TextEdit::load_state(ctx, state.editor_id) {
-        if let Some(range) = edit_state.cursor.char_range() {
-            let start = range.primary.index.min(range.secondary.index);
-            let end = range.primary.index.max(range.secondary.index);
-            let idx = state.active_tab_index;
-            let text = if end > start {
-                let deleted = delete_char_range(&state.tabs[idx].text, start, end);
-                insert_at_char_index(&deleted, start, &clipboard)
-            } else {
-                insert_at_char_index(&state.tabs[idx].text, start, &clipboard)
-            };
-            state.tabs[idx].text = text;
-            let new_pos = start + clipboard.chars().count();
-            edit_state
-                .cursor
-                .set_char_range(Some(egui::text::CCursorRange::one(
-                    egui::text::CCursor::new(new_pos),
-                )));
-            edit_state.store(ctx, state.editor_id);
-        }
-    }
+/// Pastes from the clipboard by forwarding to egui's built-in TextEdit handler.
+/// This ensures the menu "Paste" action behaves identically to Cmd+V.
+fn action_paste(_state: &mut AppState, ctx: &egui::Context) {
+    ctx.send_viewport_cmd(egui::ViewportCommand::RequestPaste);
 }
 
 /// Undoes last action(this is pretty complicated)

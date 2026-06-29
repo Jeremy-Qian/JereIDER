@@ -5,6 +5,5 @@ edition = "2021"
 
 [dependencies]
 eframe = "0.34"
-arboard = "3.6.1"
 jereide-core = { path = "../core" }
 jereide-syntax = { path = "../syntax" }
