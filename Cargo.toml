@@ -2,6 +2,8 @@
 members = [
     "crates/app",
     "crates/core",
+    "crates/style",
+    "crates/text",
     "crates/syntax",
     "crates/menu",
     "crates/window",

@@ -1,5 +1,6 @@
 use eframe::egui;
-use jereide_core::{AppState, ACCENT};
+use jereide_core::AppState;
+use jereide_style::ACCENT;
 
 pub enum CloseConfirmAction {
     Save(usize),

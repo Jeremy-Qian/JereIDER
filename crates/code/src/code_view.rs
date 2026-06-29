@@ -2,12 +2,14 @@ use std::cell::RefCell;
 use std::sync::Arc;
 
 use eframe::egui;
-use jereide_core::{
-    char_index_to_line_col, AppState, EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM,
+use jereide_core::AppState;
+use jereide_style::{
+    EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM,
     EDITOR_INNER_MARGIN_LEFT_EXTRA, EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP,
     GUTTER_DIGIT_WIDTH, GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
     SCROLL_BAR_WIDTH, SURFACE_BG, TEXT_CURRENT_LINE, TEXT_MUTED,
 };
+use jereide_text::char_index_to_line_col;
 use jereide_syntax::SyntaxHighlighter;
 
 thread_local! {
