@@ -1,20 +1,41 @@
 use eframe::egui;
 use jereide_core::{char_range_substring, delete_char_range, insert_at_char_index, AppState};
 
-// All the actions are handled here
-pub fn handle_edit_action(state: &mut AppState, ctx: &egui::Context, action: &str) {
-    match action {
-        "select_all" => action_select_all(state, ctx),
-        "copy" => action_copy(state, ctx),
-        "cut" => action_cut(state, ctx),
-        "paste" => action_paste(state, ctx),
-        "undo" => action_undo(state, ctx),
-        "redo" => action_redo(state, ctx),
-        "githubstar" => action_github_star(state, ctx),
-        _ => {
-            // This isn't supposed to happen, but who knows?
-            eprintln!("Unknown edit action: '{}'", action);
+/// Type-safe edit actions that the menu system can dispatch to the editor.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EditAction {
+    SelectAll,
+    Copy,
+    Cut,
+    Paste,
+    Undo,
+    Redo,
+}
+
+impl EditAction {
+    /// Convert a menu event string to an edit action, if it matches.
+    pub fn from_menu_id(id: &str) -> Option<Self> {
+        match id {
+            "select_all" => Some(Self::SelectAll),
+            "copy" => Some(Self::Copy),
+            "cut" => Some(Self::Cut),
+            "paste" => Some(Self::Paste),
+            "undo" => Some(Self::Undo),
+            "redo" => Some(Self::Redo),
+            _ => None,
         }
+    }
+}
+
+/// Dispatch an edit action.
+pub fn handle_edit_action(state: &mut AppState, ctx: &egui::Context, action: EditAction) {
+    match action {
+        EditAction::SelectAll => action_select_all(state, ctx),
+        EditAction::Copy => action_copy(state, ctx),
+        EditAction::Cut => action_cut(state, ctx),
+        EditAction::Paste => action_paste(state, ctx),
+        EditAction::Undo => action_undo(state, ctx),
+        EditAction::Redo => action_redo(state, ctx),
     }
 }
 
@@ -139,11 +160,4 @@ fn action_redo(state: &mut AppState, ctx: &egui::Context) {
         }
     }
 }
-/// Star us on GitHub!
-fn action_github_star(_state: &AppState, ctx: &egui::Context) {
-    ctx.open_url(egui::OpenUrl {
-        // TODO: Use real URL instead
-        url: String::from("https://github.com/jeremy-qian/jereide"),
-        new_tab: true,
-    });
-}
+
