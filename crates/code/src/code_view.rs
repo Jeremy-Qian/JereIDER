@@ -2,18 +2,15 @@ use std::cell::RefCell;
 use std::sync::Arc;
 
 use eframe::egui;
-use jereide_core::AppState;
 use jereide_core::constants::{
-    EDITOR_INNER_MARGIN_BOTTOM,
-    EDITOR_INNER_MARGIN_LEFT_EXTRA, EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP,
-    GUTTER_DIGIT_WIDTH, GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
-    SCROLL_BAR_WIDTH,
+    EDITOR_INNER_MARGIN_BOTTOM, EDITOR_INNER_MARGIN_LEFT_EXTRA, EDITOR_INNER_MARGIN_RIGHT,
+    EDITOR_INNER_MARGIN_TOP, GUTTER_DIGIT_WIDTH, GUTTER_LINE_NUMBER_RIGHT_OFFSET,
+    GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT, SCROLL_BAR_WIDTH,
 };
-use jereide_settings::{
-    EDITOR_FONT_SIZE, SURFACE_BG, TEXT_CURRENT_LINE, TEXT_MUTED,
-};
-use jereide_text::char_index_to_line_col;
+use jereide_core::AppState;
+use jereide_settings::{EDITOR_FONT_SIZE, SURFACE_BG, TEXT_CURRENT_LINE, TEXT_MUTED};
 use jereide_syntax::SyntaxHighlighter;
+use jereide_text::char_index_to_line_col;
 
 thread_local! {
     static HIGHLIGHTER: RefCell<Option<SyntaxHighlighter>> = const { RefCell::new(None) };

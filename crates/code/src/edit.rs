@@ -135,4 +135,3 @@ fn action_redo(state: &mut AppState, ctx: &egui::Context) {
         }
     }
 }
-

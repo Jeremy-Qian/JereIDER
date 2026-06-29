@@ -1,9 +1,8 @@
 use eframe::egui;
-use jereide_core::{AppState, CurrentView};
 use jereide_core::constants::{
-    TITLE_BAR_FULLSCREEN_SPACE,
-    TITLE_BAR_HEIGHT, TITLE_BAR_POPUP_GAP, TITLE_BAR_TRAFFIC_SPACE,
+    TITLE_BAR_FULLSCREEN_SPACE, TITLE_BAR_HEIGHT, TITLE_BAR_POPUP_GAP, TITLE_BAR_TRAFFIC_SPACE,
 };
+use jereide_core::{AppState, CurrentView};
 use jereide_settings::{ELEVATED_BG, TITLE_BAR_FONT_SIZE};
 
 pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: bool) {

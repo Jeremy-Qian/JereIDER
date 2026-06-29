@@ -3,7 +3,6 @@
 // TODO: Load all of these from a settings.json or something
 // like that at runtime instead of hardcoding them.
 
-
 use eframe::egui::Color32;
 
 pub const SURFACE_BG: Color32 = Color32::WHITE;

@@ -229,8 +229,7 @@ impl eframe::App for JereIDEApp {
                 "save_as" => self.handle_save_as(),
                 "quit" => std::process::exit(0),
                 "fullscreen" => {
-                    let is_fullscreen =
-                        ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
+                    let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                     ctx.send_viewport_cmd(egui::ViewportCommand::Fullscreen(!is_fullscreen));
                 }
                 "githubstar" => {
@@ -260,8 +259,7 @@ impl eframe::App for JereIDEApp {
                     style.visuals.extreme_bg_color = SURFACE_BG;
                     style.spacing.item_spacing.y = ITEM_SPACING_Y;
 
-                    let is_fullscreen =
-                        ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
+                    let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                     jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
                     jereide_ui::tab_strip::render_tab_strip(state, ui);
 
@@ -294,8 +292,7 @@ impl eframe::App for JereIDEApp {
 
         use jereide_ui::dialog::CloseConfirmAction;
 
-        if let Some(action) =
-            jereide_ui::dialog::render_close_confirm_modal(&mut self.state, &ctx)
+        if let Some(action) = jereide_ui::dialog::render_close_confirm_modal(&mut self.state, &ctx)
         {
             match action {
                 CloseConfirmAction::Save(idx) => {

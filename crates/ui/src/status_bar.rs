@@ -1,6 +1,6 @@
 use eframe::egui;
-use jereide_core::AppState;
 use jereide_core::constants::STATUS_BAR_MARGIN;
+use jereide_core::AppState;
 use jereide_settings::SURFACE_BG;
 
 pub fn render_status_bar(state: &AppState, ui: &mut egui::Ui) {
