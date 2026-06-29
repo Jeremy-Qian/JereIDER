@@ -168,7 +168,6 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         BORDER,
     );
 
-    // Bottom border across the full strip width
     painter.rect_filled(
         Rect::from_min_size(
             Pos2::new(strip_rect.left(), tab_bottom - TAB_BORDER_WIDTH),
@@ -178,7 +177,6 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         BORDER,
     );
 
-    // Cover the bottom border under the active tab so it merges with the editor
     if let Some(active) = layouts.get(state.active_tab_index) {
         painter.rect_filled(
             Rect::from_min_size(
@@ -190,8 +188,6 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         );
     }
 
-    // Draw all vlines last so they render on top of the cover rect,
-    // ensuring the vertical lines extend cleanly to the bottom corners.
     for idx in 0..state.tabs.len() {
         painter.vline(
             layouts[idx].rect.left(),
