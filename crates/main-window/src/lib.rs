@@ -3,11 +3,108 @@ use jereide_core::{
     AppState, CurrentView, ITEM_SPACING_Y, TITLE_BAR_HEIGHT, TRAFFIC_LIGHT_OFFSET_X,
     TRAFFIC_LIGHT_OFFSET_Y,
 };
-use jereide_settings::SURFACE_BG;
 use jereide_fs::FileManager;
 use jereide_menu::AppMenu;
+use jereide_settings::SURFACE_BG;
 
-/// Contains the app state, the menu, and the file manager.
+// ---------------------------------------------------------------------------
+// macOS native window helpers
+// ---------------------------------------------------------------------------
+
+#[cfg(target_os = "macos")]
+pub fn set_document_edited(frame: &eframe::Frame, edited: bool) {
+    use objc2::msg_send;
+    use objc2::runtime::AnyObject;
+    use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+
+    let Ok(handle) = frame.window_handle() else {
+        return;
+    };
+    let RawWindowHandle::AppKit(appkit) = handle.as_raw() else {
+        return;
+    };
+
+    let ns_view = appkit.ns_view.as_ptr() as *mut AnyObject;
+
+    unsafe {
+        let ns_window: *mut AnyObject = msg_send![ns_view, window];
+        if ns_window.is_null() {
+            return;
+        }
+        let _: () = msg_send![ns_window, setDocumentEdited: edited];
+    }
+}
+
+#[cfg(target_os = "macos")]
+pub fn position_traffic_lights(frame: &eframe::Frame, offset_x: f64, offset_y: f64) {
+    use objc2::msg_send;
+    use objc2::runtime::AnyObject;
+    use objc2_foundation::{NSPoint, NSRect};
+    use raw_window_handle::{HasWindowHandle, RawWindowHandle};
+    use std::sync::OnceLock;
+
+    let Ok(handle) = frame.window_handle() else {
+        return;
+    };
+    let RawWindowHandle::AppKit(appkit) = handle.as_raw() else {
+        return;
+    };
+
+    let ns_view = appkit.ns_view.as_ptr() as *mut AnyObject;
+
+    unsafe {
+        let ns_window: *mut AnyObject = msg_send![ns_view, window];
+        if ns_window.is_null() {
+            return;
+        }
+
+        static DEFAULTS: OnceLock<[(f64, f64); 3]> = OnceLock::new();
+
+        let mut origins = [(0.0f64, 0.0f64); 3];
+        let mut any_found = false;
+
+        for tag in 0i64..3 {
+            let button: *mut AnyObject = msg_send![ns_window, standardWindowButton: tag];
+            if button.is_null() {
+                continue;
+            }
+            any_found = true;
+            let frame: NSRect = msg_send![button, frame];
+            origins[tag as usize] = (frame.origin.x, frame.origin.y);
+        }
+
+        if any_found {
+            let _ = DEFAULTS.set(origins);
+        }
+
+        let Some(defaults) = DEFAULTS.get() else {
+            return;
+        };
+
+        for tag in 0i64..3 {
+            let button: *mut AnyObject = msg_send![ns_window, standardWindowButton: tag];
+            if button.is_null() {
+                continue;
+            }
+
+            let (base_x, base_y) = defaults[tag as usize];
+            let frame: NSRect = msg_send![button, frame];
+
+            let new_frame = NSRect {
+                origin: NSPoint {
+                    x: base_x + offset_x,
+                    y: base_y + offset_y,
+                },
+                size: frame.size,
+            };
+            let _: () = msg_send![button, setFrame: new_frame];
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Main application struct — ties together state, menu, file manager, and UI
+// ---------------------------------------------------------------------------
 
 pub struct JereIDEApp {
     state: AppState,
@@ -15,13 +112,11 @@ pub struct JereIDEApp {
     file_manager: FileManager,
 }
 
-/// Just defaults for it.
-
 impl JereIDEApp {
-    pub fn new(app_menu: AppMenu) -> Self {
+    pub fn new() -> Self {
         Self {
             state: AppState::new(),
-            app_menu,
+            app_menu: AppMenu::new(),
             file_manager: FileManager::new(),
         }
     }
@@ -44,7 +139,6 @@ impl JereIDEApp {
             Some(p) => {
                 let text = self.state.current_tab().text.clone();
                 if let Err(e) = FileManager::save_to_path(&text, &std::path::PathBuf::from(&p)) {
-                    // TODO: Pop out a message thing instead of printing an error
                     eprintln!("Failed to save file: {}", e);
                 } else {
                     self.state.mark_saved();
@@ -58,7 +152,6 @@ impl JereIDEApp {
         if let Some(path) = FileManager::save_as_dialog() {
             let text = self.state.current_tab().text.clone();
             if let Err(e) = FileManager::save_to_path(&text, &path) {
-                // TODO: Pop out a message thing instead of printing an error
                 eprintln!("Failed to save file: {}", e);
             } else {
                 let path_str = path.display().to_string();
@@ -103,23 +196,17 @@ impl JereIDEApp {
 impl eframe::App for JereIDEApp {
     fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         let ctx = ui.ctx().clone();
-        // Actually the only target is macOS so far, Windows support is planned
+
         #[cfg(target_os = "macos")]
         {
             let is_modified = self.state.is_modified();
             if is_modified != self.state.document_edited {
                 self.state.document_edited = is_modified;
-                jereide_window::set_document_edited(frame, is_modified);
+                set_document_edited(frame, is_modified);
             }
 
             let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
-
-            jereide_window::position_traffic_lights(
-                frame,
-                TRAFFIC_LIGHT_OFFSET_X,
-                TRAFFIC_LIGHT_OFFSET_Y,
-            );
-
+            position_traffic_lights(frame, TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y);
             self.state.was_fullscreen = is_fullscreen;
         }
 
@@ -129,7 +216,6 @@ impl eframe::App for JereIDEApp {
         }
 
         for event_id in self.app_menu.poll_events() {
-            // The menu actions
             match event_id.as_ref() {
                 "new" => self.handle_new(),
                 "open" => self.handle_open(),
@@ -137,7 +223,8 @@ impl eframe::App for JereIDEApp {
                 "save_as" => self.handle_save_as(),
                 "quit" => std::process::exit(0),
                 "fullscreen" => {
-                    let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
+                    let is_fullscreen =
+                        ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                     ctx.send_viewport_cmd(egui::ViewportCommand::Fullscreen(!is_fullscreen));
                 }
                 "githubstar" => {
@@ -149,11 +236,7 @@ impl eframe::App for JereIDEApp {
                 _ => {
                     if let Some(action) = jereide_code::EditAction::from_menu_id(event_id.as_ref())
                     {
-                        jereide_code::edit::handle_edit_action(
-                            &mut self.state,
-                            &ctx,
-                            action,
-                        );
+                        jereide_code::edit::handle_edit_action(&mut self.state, &ctx, action);
                     }
                 }
             }
@@ -171,9 +254,9 @@ impl eframe::App for JereIDEApp {
                     style.visuals.extreme_bg_color = SURFACE_BG;
                     style.spacing.item_spacing.y = ITEM_SPACING_Y;
 
-                    let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
+                    let is_fullscreen =
+                        ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                     jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
-
                     jereide_ui::tab_strip::render_tab_strip(state, ui);
 
                     let content_rect = ui.available_rect_before_wrap();
@@ -186,7 +269,6 @@ impl eframe::App for JereIDEApp {
                     jereide_code::code_view::render_code_view(state, &mut code_ui);
                 });
 
-            // Command view covers everything
             if state.current_view == CurrentView::Command {
                 let title_bar_height = TITLE_BAR_HEIGHT;
                 let full_area = ui.ctx().content_rect();
@@ -206,7 +288,8 @@ impl eframe::App for JereIDEApp {
 
         use jereide_ui::dialog::CloseConfirmAction;
 
-        if let Some(action) = jereide_ui::dialog::render_close_confirm_modal(&mut self.state, &ctx)
+        if let Some(action) =
+            jereide_ui::dialog::render_close_confirm_modal(&mut self.state, &ctx)
         {
             match action {
                 CloseConfirmAction::Save(idx) => {

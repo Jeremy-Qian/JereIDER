@@ -1,11 +1,7 @@
+use jereide_main_window::JereIDEApp;
 use jereide_settings::{WINDOW_HEIGHT, WINDOW_WIDTH};
-use jereide_menu::AppMenu;
-
-// Entry point to JereIDE.
 
 fn main() -> Result<(), eframe::Error> {
-    let app_menu = AppMenu::new();
-
     let options = eframe::NativeOptions {
         viewport: eframe::egui::ViewportBuilder::default()
             .with_inner_size([WINDOW_WIDTH, WINDOW_HEIGHT])
@@ -18,6 +14,6 @@ fn main() -> Result<(), eframe::Error> {
     eframe::run_native(
         "jereide",
         options,
-        Box::new(|_cc| Ok(Box::new(jereide_main::JereIDEApp::new(app_menu)))),
+        Box::new(|_cc| Ok(Box::new(JereIDEApp::new()))),
     )
 }
