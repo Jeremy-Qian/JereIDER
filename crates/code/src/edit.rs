@@ -88,12 +88,27 @@ fn action_cut(state: &mut AppState, ctx: &egui::Context) {
     }
 }
 
+/// Returns the current clipboard text, reusing a single cached clipboard instance.
+fn clipboard_text() -> String {
+    use std::sync::Mutex;
+    static CLIPBOARD: std::sync::OnceLock<Mutex<arboard::Clipboard>> =
+        std::sync::OnceLock::new();
+    CLIPBOARD
+        .get_or_init(|| {
+            Mutex::new(
+                arboard::Clipboard::new()
+                    .expect("failed to initialize system clipboard"),
+            )
+        })
+        .lock()
+        .ok()
+        .and_then(|mut cb| cb.get_text().ok())
+        .unwrap_or_default()
+}
+
 /// Pastes from the clipboard.
 fn action_paste(state: &mut AppState, ctx: &egui::Context) {
-    let clipboard = arboard::Clipboard::new()
-        .ok()
-        .and_then(|mut c| c.get_text().ok())
-        .unwrap_or_default();
+    let clipboard = clipboard_text();
     if clipboard.is_empty() {
         return;
     }
