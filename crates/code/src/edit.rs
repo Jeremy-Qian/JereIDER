@@ -1,5 +1,6 @@
 use eframe::egui;
-use jereide_core::{char_range_substring, delete_char_range, AppState};
+use jereide_core::AppState;
+use jereide_text::{char_range_substring, delete_char_range};
 
 /// Type-safe edit actions that the menu system can dispatch to the editor.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

@@ -1,4 +1,4 @@
-use jereide_core::{WINDOW_HEIGHT, WINDOW_WIDTH};
+use jereide_style::{WINDOW_HEIGHT, WINDOW_WIDTH};
 use jereide_menu::AppMenu;
 
 // Entry point to JereIDE.

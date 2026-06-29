@@ -1,5 +1,5 @@
 use eframe::egui::{self, Color32, FontId, TextFormat};
-use jereide_core::TEXT_DEFAULT;
+use jereide_style::TEXT_DEFAULT;
 use std::sync::OnceLock;
 use syntect::easy::HighlightLines;
 use syntect::highlighting::{HighlightState, Theme, ThemeSet};

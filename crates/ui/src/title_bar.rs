@@ -1,6 +1,7 @@
 use eframe::egui;
-use jereide_core::{
-    AppState, CurrentView, ELEVATED_BG, TITLE_BAR_FONT_SIZE, TITLE_BAR_FULLSCREEN_SPACE,
+use jereide_core::{AppState, CurrentView};
+use jereide_style::{
+    ELEVATED_BG, TITLE_BAR_FONT_SIZE, TITLE_BAR_FULLSCREEN_SPACE,
     TITLE_BAR_HEIGHT, TITLE_BAR_POPUP_GAP, TITLE_BAR_TRAFFIC_SPACE,
 };
 
