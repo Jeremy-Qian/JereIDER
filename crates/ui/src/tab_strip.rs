@@ -2,11 +2,10 @@ use std::sync::Arc;
 
 use eframe::egui::{self, Color32, FontId, Pos2, Rect, Sense, Stroke, Vec2};
 use jereide_core::{
-    AppState, TAB_ACTIVE_BG, TAB_ACTIVE_TEXT, TAB_BORDER, TAB_BORDER_WIDTH, TAB_CLOSE_BG_HOVER,
-    TAB_CLOSE_BTN_RADIUS, TAB_CLOSE_BTN_SIZE, TAB_CLOSE_BTN_SPACING, TAB_CLOSE_ICON,
-    TAB_CLOSE_ICON_HALF, TAB_CLOSE_ICON_HOVER, TAB_CLOSE_STROKE, TAB_FONT_SIZE, TAB_INACTIVE_BG,
-    TAB_INACTIVE_TEXT, TAB_MODIFIED_DOT, TAB_MODIFIED_DOT_RADIUS, TAB_PAD_LEFT, TAB_PAD_RIGHT,
-    TAB_STRIP_BG, TAB_STRIP_HEIGHT,
+    AppState, ACCENT, BORDER, ELEVATED_BG, HOVER_BG, SURFACE_BG, TAB_BORDER_WIDTH,
+    TAB_CLOSE_BTN_RADIUS, TAB_CLOSE_BTN_SIZE, TAB_CLOSE_BTN_SPACING, TAB_CLOSE_ICON_HALF,
+    TAB_CLOSE_STROKE, TAB_FONT_SIZE, TAB_MODIFIED_DOT_RADIUS, TAB_PAD_LEFT, TAB_PAD_RIGHT,
+    TAB_STRIP_HEIGHT, TEXT_DEFAULT, TEXT_PRIMARY, TEXT_SECONDARY,
 };
 
 struct TabLayout {
@@ -111,38 +110,34 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
 
     let painter = ui.painter();
 
-    painter.rect_filled(strip_rect, 0.0, TAB_STRIP_BG);
+    painter.rect_filled(strip_rect, 0.0, ELEVATED_BG);
 
     for idx in 0..state.tabs.len() {
         let layout = &layouts[idx];
         let is_active = idx == state.active_tab_index;
-        let bg = if is_active {
-            TAB_ACTIVE_BG
-        } else {
-            TAB_INACTIVE_BG
-        };
+        let bg = if is_active { SURFACE_BG } else { ELEVATED_BG };
 
         painter.rect_filled(layout.rect, 0.0, bg);
 
         let text_color = if is_active {
-            TAB_ACTIVE_TEXT
+            TEXT_PRIMARY
         } else {
-            TAB_INACTIVE_TEXT
+            TEXT_SECONDARY
         };
         painter.galley_with_override_text_color(layout.text_pos, layout.galley.clone(), text_color);
 
         if layout.has_dot {
-            painter.circle_filled(layout.dot_pos, TAB_MODIFIED_DOT_RADIUS, TAB_MODIFIED_DOT);
+            painter.circle_filled(layout.dot_pos, TAB_MODIFIED_DOT_RADIUS, ACCENT);
         }
 
         if tab_hovered[idx] {
             if close_hovered[idx] {
-                painter.rect_filled(layout.close_rect, TAB_CLOSE_BTN_RADIUS, TAB_CLOSE_BG_HOVER);
+                painter.rect_filled(layout.close_rect, TAB_CLOSE_BTN_RADIUS, HOVER_BG);
             }
             let icon_color = if close_hovered[idx] {
-                TAB_CLOSE_ICON_HOVER
+                TEXT_DEFAULT
             } else {
-                TAB_CLOSE_ICON
+                TEXT_PRIMARY
             };
             let cx = layout.close_rect.center().x;
             let cy = layout.close_rect.center().y;
@@ -170,7 +165,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
             Vec2::new(strip_rect.width(), TAB_BORDER_WIDTH),
         ),
         0.0,
-        TAB_BORDER,
+        BORDER,
     );
 
     // Bottom border across the full strip width
@@ -180,7 +175,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
             Vec2::new(strip_rect.width(), TAB_BORDER_WIDTH),
         ),
         0.0,
-        TAB_BORDER,
+        BORDER,
     );
 
     // Cover the bottom border under the active tab so it merges with the editor
@@ -191,7 +186,7 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
                 Vec2::new(active.rect.width(), TAB_BORDER_WIDTH),
             ),
             0.0,
-            TAB_ACTIVE_BG,
+            SURFACE_BG,
         );
     }
 
@@ -201,14 +196,14 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         painter.vline(
             layouts[idx].rect.left(),
             layouts[idx].rect.y_range(),
-            Stroke::new(TAB_BORDER_WIDTH, TAB_BORDER),
+            Stroke::new(TAB_BORDER_WIDTH, BORDER),
         );
     }
     if let Some(last) = layouts.last() {
         painter.vline(
             last.rect.right(),
             last.rect.y_range(),
-            Stroke::new(TAB_BORDER_WIDTH, TAB_BORDER),
+            Stroke::new(TAB_BORDER_WIDTH, BORDER),
         );
     }
 

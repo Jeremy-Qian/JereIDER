@@ -151,10 +151,10 @@ impl eframe::App for JereIDEApp {
             jereide_ui::status_bar::render_status_bar(state, ui);
 
             egui::CentralPanel::default()
-                .frame(egui::Frame::NONE.fill(jereide_core::EDITOR_BG))
+                .frame(egui::Frame::NONE.fill(jereide_core::SURFACE_BG))
                 .show_inside(ui, |ui| {
                     let style = ui.style_mut();
-                    style.visuals.extreme_bg_color = jereide_core::EDITOR_BG;
+                    style.visuals.extreme_bg_color = jereide_core::SURFACE_BG;
                     style.spacing.item_spacing.y = ITEM_SPACING_Y;
 
                     let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
@@ -192,7 +192,8 @@ impl eframe::App for JereIDEApp {
 
         use jereide_ui::dialog::CloseConfirmAction;
 
-        if let Some(action) = jereide_ui::dialog::render_close_confirm_modal(&mut self.state, &ctx) {
+        if let Some(action) = jereide_ui::dialog::render_close_confirm_modal(&mut self.state, &ctx)
+        {
             match action {
                 CloseConfirmAction::Save(idx) => {
                     if self.save_tab(idx) {

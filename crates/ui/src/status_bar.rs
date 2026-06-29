@@ -1,11 +1,11 @@
 use eframe::egui;
-use jereide_core::{AppState, STATUS_BAR_BG, STATUS_BAR_MARGIN};
+use jereide_core::{AppState, STATUS_BAR_MARGIN, SURFACE_BG};
 
 pub fn render_status_bar(state: &AppState, ui: &mut egui::Ui) {
     egui::Panel::bottom("status_bar")
         .frame(
             egui::Frame::NONE
-                .fill(STATUS_BAR_BG)
+                .fill(SURFACE_BG)
                 .inner_margin(STATUS_BAR_MARGIN),
         )
         .show_inside(ui, |ui| {

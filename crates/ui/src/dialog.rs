@@ -1,5 +1,5 @@
 use eframe::egui;
-use jereide_core::{AppState, SAVE_BUTTON_BG};
+use jereide_core::{AppState, ACCENT};
 
 pub enum CloseConfirmAction {
     Save(usize),
@@ -15,8 +15,7 @@ pub fn render_close_confirm_modal(
     let file_name = state.tabs[idx].file_name();
     let dim_rect = ctx.viewport_rect();
 
-    let dim_layer =
-        egui::LayerId::new(egui::Order::Foreground, egui::Id::new("modal_dimmer"));
+    let dim_layer = egui::LayerId::new(egui::Order::Foreground, egui::Id::new("modal_dimmer"));
     let dim_painter = ctx.layer_painter(dim_layer);
     dim_painter.rect_filled(dim_rect, 0.0, egui::Color32::from_black_alpha(120));
 
@@ -42,7 +41,7 @@ pub fn render_close_confirm_modal(
             if ui
                 .add_sized(
                     egui::vec2(btn_w, 0.0),
-                    egui::Button::new("Save").fill(SAVE_BUTTON_BG),
+                    egui::Button::new("Save").fill(ACCENT),
                 )
                 .clicked()
             {

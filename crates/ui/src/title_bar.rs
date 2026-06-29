@@ -1,6 +1,6 @@
 use eframe::egui;
 use jereide_core::{
-    AppState, CurrentView, TITLE_BAR_BG, TITLE_BAR_FONT_SIZE, TITLE_BAR_FULLSCREEN_SPACE,
+    AppState, CurrentView, ELEVATED_BG, TITLE_BAR_FONT_SIZE, TITLE_BAR_FULLSCREEN_SPACE,
     TITLE_BAR_HEIGHT, TITLE_BAR_POPUP_GAP, TITLE_BAR_TRAFFIC_SPACE,
 };
 
@@ -10,7 +10,7 @@ pub fn render_title_bar(state: &mut AppState, ui: &mut egui::Ui, is_fullscreen: 
         egui::vec2(available.x, TITLE_BAR_HEIGHT),
         egui::Sense::hover(),
     );
-    ui.painter().rect_filled(rect, 0.0, TITLE_BAR_BG);
+    ui.painter().rect_filled(rect, 0.0, ELEVATED_BG);
     ui.scope_builder(egui::UiBuilder::new().max_rect(rect), |ui| {
         ui.style_mut().text_styles.insert(
             egui::TextStyle::Button,

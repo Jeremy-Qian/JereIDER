@@ -3,10 +3,10 @@ use std::sync::Arc;
 
 use eframe::egui;
 use jereide_core::{
-    char_index_to_line_col, AppState, EDITOR_BG, EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM,
-    EDITOR_INNER_MARGIN_LEFT_EXTRA, EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP, GUTTER_BG,
+    char_index_to_line_col, AppState, EDITOR_FONT_SIZE, EDITOR_INNER_MARGIN_BOTTOM,
+    EDITOR_INNER_MARGIN_LEFT_EXTRA, EDITOR_INNER_MARGIN_RIGHT, EDITOR_INNER_MARGIN_TOP,
     GUTTER_DIGIT_WIDTH, GUTTER_LINE_NUMBER_RIGHT_OFFSET, GUTTER_PADDING_LEFT, GUTTER_PADDING_RIGHT,
-    GUTTER_TEXT, GUTTER_TEXT_CURRENT, SCROLL_BAR_WIDTH,
+    SCROLL_BAR_WIDTH, SURFACE_BG, TEXT_CURRENT_LINE, TEXT_MUTED,
 };
 use jereide_syntax::SyntaxHighlighter;
 
@@ -32,7 +32,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
     let ctx = ui.ctx().clone();
 
     let style = ui.style_mut();
-    style.visuals.extreme_bg_color = EDITOR_BG;
+    style.visuals.extreme_bg_color = SURFACE_BG;
     style.visuals.widgets.inactive.bg_stroke = egui::Stroke::NONE;
     style.visuals.widgets.hovered.bg_stroke = egui::Stroke::NONE;
     style.visuals.widgets.active.bg_stroke = egui::Stroke::NONE;
@@ -140,7 +140,7 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     egui::vec2(gutter_w, g_bottom - gutter_rect.top()),
                 ),
                 0.0,
-                GUTTER_BG,
+                SURFACE_BG,
             );
 
             let line_start_y = widget_top + EDITOR_INNER_MARGIN_TOP as f32;
@@ -150,9 +150,9 @@ pub fn render_code_view(state: &mut AppState, ui: &mut egui::Ui) {
                     let line_num = i + 1;
                     let is_current = line_num == cursor_line;
                     let color = if is_current {
-                        GUTTER_TEXT_CURRENT
+                        TEXT_CURRENT_LINE
                     } else {
-                        GUTTER_TEXT
+                        TEXT_MUTED
                     };
                     painter.text(
                         egui::pos2(gutter_w - GUTTER_LINE_NUMBER_RIGHT_OFFSET, line_y),
