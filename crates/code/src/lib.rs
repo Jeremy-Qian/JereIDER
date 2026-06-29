@@ -1,3 +1,4 @@
 pub mod code_view;
 pub mod edit;
-// Just two modules.
+
+pub use edit::EditAction;

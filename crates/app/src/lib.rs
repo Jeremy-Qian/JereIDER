@@ -139,8 +139,21 @@ impl eframe::App for JereIDEApp {
                     let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
                     ctx.send_viewport_cmd(egui::ViewportCommand::Fullscreen(!is_fullscreen));
                 }
+                "githubstar" => {
+                    ctx.open_url(egui::OpenUrl {
+                        url: String::from("https://github.com/jeremy-qian/jereide"),
+                        new_tab: true,
+                    });
+                }
                 _ => {
-                    jereide_code::edit::handle_edit_action(&mut self.state, &ctx, event_id.as_ref())
+                    if let Some(action) = jereide_code::EditAction::from_menu_id(event_id.as_ref())
+                    {
+                        jereide_code::edit::handle_edit_action(
+                            &mut self.state,
+                            &ctx,
+                            action,
+                        );
+                    }
                 }
             }
         }
