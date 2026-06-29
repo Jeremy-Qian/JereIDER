@@ -5,7 +5,7 @@ use jereide_core::{
 };
 use jereide_fs::FileManager;
 use jereide_menu::AppMenu;
-use jereide_settings::SURFACE_BG;
+use jereide_settings::{ACCENT, SURFACE_BG};
 
 // ---------------------------------------------------------------------------
 // macOS native window helpers
@@ -196,6 +196,12 @@ impl JereIDEApp {
 impl eframe::App for JereIDEApp {
     fn ui(&mut self, ui: &mut egui::Ui, frame: &mut eframe::Frame) {
         let ctx = ui.ctx().clone();
+
+        // Apply accent theme every frame so per-widget overrides don't reset it
+        let mut visuals = ctx.global_style().visuals.clone();
+        visuals.selection.bg_fill = ACCENT;
+        visuals.selection.stroke = egui::Stroke::new(1.0, jereide_settings::TEXT_DEFAULT);
+        ctx.set_visuals(visuals);
 
         #[cfg(target_os = "macos")]
         {
