@@ -3,22 +3,11 @@ name = "JereIDE"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-name = "jereide_main"
-path = "src/lib.rs"
-
 [[bin]]
 name = "JereIDE"
 path = "src/main.rs"
 
 [dependencies]
 eframe = "0.34"
-jereide-core = { path = "../core" }
 jereide-settings = { path = "../settings" }
-jereide-text = { path = "../text" }
-jereide-fs = { path = "../fs" }
-jereide-menu = { path = "../menu" }
-jereide-window = { path = "../window" }
-jereide-ui = { path = "../ui" }
-jereide-code = { path = "../code" }
-jereide-command = { path = "../command" }
+jereide-main-window = { path = "../main-window" }

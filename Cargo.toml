@@ -6,7 +6,7 @@ members = [
     "crates/text",
     "crates/syntax",
     "crates/menu",
-    "crates/window",
+    "crates/main-window",
     "crates/ui",
     "crates/code",
     "crates/command",

@@ -7,15 +7,8 @@ name = "JereIDE"
 version = "0.1.0"
 dependencies = [
  "eframe",
- "jereide-code",
- "jereide-command",
- "jereide-core",
- "jereide-fs",
- "jereide-menu",
+ "jereide-main-window",
  "jereide-settings",
- "jereide-text",
- "jereide-ui",
- "jereide-window",
 ]
 
 [[package]]
@@ -1997,6 +1990,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "jereide-main-window"
+version = "0.1.0"
+dependencies = [
+ "eframe",
+ "jereide-code",
+ "jereide-command",
+ "jereide-core",
+ "jereide-fs",
+ "jereide-menu",
+ "jereide-settings",
+ "jereide-ui",
+ "objc2 0.5.2",
+ "objc2-foundation 0.2.2",
+ "raw-window-handle",
+]
+
+[[package]]
 name = "jereide-menu"
 version = "0.1.0"
 dependencies = [
@@ -2031,16 +2041,6 @@ dependencies = [
  "eframe",
  "jereide-core",
  "jereide-settings",
-]
-
-[[package]]
-name = "jereide-window"
-version = "0.1.0"
-dependencies = [
- "eframe",
- "objc2 0.5.2",
- "objc2-foundation 0.2.2",
- "raw-window-handle",
 ]
 
 [[package]]
