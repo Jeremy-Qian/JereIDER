@@ -1,11 +1,9 @@
 use eframe::egui;
 use jereide_core::{
-    AppState, CurrentView,
-};
-use jereide_style::{
-    ITEM_SPACING_Y, SURFACE_BG, TITLE_BAR_HEIGHT, TRAFFIC_LIGHT_OFFSET_X,
+    AppState, CurrentView, ITEM_SPACING_Y, TITLE_BAR_HEIGHT, TRAFFIC_LIGHT_OFFSET_X,
     TRAFFIC_LIGHT_OFFSET_Y,
 };
+use jereide_settings::SURFACE_BG;
 use jereide_fs::FileManager;
 use jereide_menu::AppMenu;
 

@@ -2,7 +2,7 @@
 members = [
     "crates/app",
     "crates/core",
-    "crates/style",
+    "crates/settings",
     "crates/text",
     "crates/syntax",
     "crates/menu",

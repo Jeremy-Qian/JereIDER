@@ -1,5 +1,5 @@
 use eframe::egui;
-use jereide_style::{COMMAND_BG, COMMAND_TEXT, COMMAND_VIEW_FONT_SIZE};
+use jereide_settings::{COMMAND_BG, COMMAND_TEXT, COMMAND_VIEW_FONT_SIZE};
 
 // Renders the whole command view.
 pub fn render_command_view(ui: &mut egui::Ui) {
