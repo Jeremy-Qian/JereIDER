@@ -68,6 +68,9 @@ pub struct AppState {
     pub current_view: CurrentView,
     pub was_fullscreen: bool,
     pub document_edited: bool,
+
+    /// When set, a confirmation dialog for closing a modified tab is shown.
+    pub pending_close_index: Option<usize>,
 }
 
 /// Another new method.
@@ -81,6 +84,7 @@ impl AppState {
             current_view: CurrentView::Code,
             was_fullscreen: false,
             document_edited: false,
+            pending_close_index: None,
         }
     }
 

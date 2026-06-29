@@ -67,6 +67,36 @@ impl JereIDEApp {
             }
         }
     }
+
+    fn save_tab(&mut self, idx: usize) -> bool {
+        let path = self.state.tabs[idx].file_path.clone();
+        match path {
+            Some(p) => {
+                let text = self.state.tabs[idx].text.clone();
+                if let Err(e) = FileManager::save_to_path(&text, &std::path::PathBuf::from(&p)) {
+                    eprintln!("Failed to save file: {}", e);
+                    false
+                } else {
+                    true
+                }
+            }
+            None => {
+                if let Some(path) = FileManager::save_as_dialog() {
+                    let text = self.state.tabs[idx].text.clone();
+                    if let Err(e) = FileManager::save_to_path(&text, &path) {
+                        eprintln!("Failed to save file: {}", e);
+                        false
+                    } else {
+                        let path_str = path.display().to_string();
+                        self.state.tabs[idx].file_path = Some(path_str);
+                        true
+                    }
+                } else {
+                    false
+                }
+            }
+        }
+    }
 }
 
 impl eframe::App for JereIDEApp {
@@ -115,47 +145,107 @@ impl eframe::App for JereIDEApp {
             }
         }
 
-        let state = &mut self.state;
+        {
+            let state = &mut self.state;
 
-        jereide_ui::status_bar::render_status_bar(state, ui);
+            jereide_ui::status_bar::render_status_bar(state, ui);
 
-        egui::CentralPanel::default()
-            .frame(egui::Frame::NONE.fill(jereide_core::EDITOR_BG))
-            .show_inside(ui, |ui| {
-                let style = ui.style_mut();
-                style.visuals.extreme_bg_color = jereide_core::EDITOR_BG;
-                style.spacing.item_spacing.y = ITEM_SPACING_Y;
+            egui::CentralPanel::default()
+                .frame(egui::Frame::NONE.fill(jereide_core::EDITOR_BG))
+                .show_inside(ui, |ui| {
+                    let style = ui.style_mut();
+                    style.visuals.extreme_bg_color = jereide_core::EDITOR_BG;
+                    style.spacing.item_spacing.y = ITEM_SPACING_Y;
 
-                let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
-                jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
+                    let is_fullscreen = ctx.input(|i| i.viewport().fullscreen.unwrap_or(false));
+                    jereide_ui::title_bar::render_title_bar(state, ui, is_fullscreen);
 
-                jereide_ui::tab_strip::render_tab_strip(state, ui);
+                    jereide_ui::tab_strip::render_tab_strip(state, ui);
 
-                let content_rect = ui.available_rect_before_wrap();
-                let mut code_ui = ui.new_child(
+                    let content_rect = ui.available_rect_before_wrap();
+                    let mut code_ui = ui.new_child(
+                        egui::UiBuilder::new()
+                            .max_rect(content_rect)
+                            .layout(egui::Layout::top_down(egui::Align::LEFT)),
+                    );
+                    code_ui.set_clip_rect(content_rect);
+                    jereide_code::code_view::render_code_view(state, &mut code_ui);
+                });
+
+            // Command view covers everything
+            if state.current_view == CurrentView::Command {
+                let title_bar_height = TITLE_BAR_HEIGHT;
+                let full_area = ui.ctx().content_rect();
+                let overlay_rect = egui::Rect::from_min_size(
+                    egui::pos2(full_area.left(), full_area.top() + title_bar_height),
+                    egui::vec2(full_area.width(), full_area.height() - title_bar_height),
+                );
+
+                let mut overlay_ui = ui.new_child(
                     egui::UiBuilder::new()
-                        .max_rect(content_rect)
+                        .max_rect(overlay_rect)
                         .layout(egui::Layout::top_down(egui::Align::LEFT)),
                 );
-                code_ui.set_clip_rect(content_rect);
-                jereide_code::code_view::render_code_view(state, &mut code_ui);
-            });
+                jereide_command::command_view::render_command_view(&mut overlay_ui);
+            }
+        }
 
-        // Command view covers everything
-        if state.current_view == CurrentView::Command {
-            let title_bar_height = TITLE_BAR_HEIGHT;
-            let full_area = ui.ctx().content_rect();
-            let overlay_rect = egui::Rect::from_min_size(
-                egui::pos2(full_area.left(), full_area.top() + title_bar_height),
-                egui::vec2(full_area.width(), full_area.height() - title_bar_height),
-            );
+        if let Some(idx) = self.state.pending_close_index {
+            let file_name = self.state.tabs[idx].file_name();
+            let screen_rect = ctx.viewport_rect();
 
-            let mut overlay_ui = ui.new_child(
-                egui::UiBuilder::new()
-                    .max_rect(overlay_rect)
-                    .layout(egui::Layout::top_down(egui::Align::LEFT)),
-            );
-            jereide_command::command_view::render_command_view(&mut overlay_ui);
+            // Dim the background (at Foreground, below the Tooltip dialog)
+            let dim_layer =
+                egui::LayerId::new(egui::Order::Foreground, egui::Id::new("modal_dimmer"));
+            let dim_painter = ctx.layer_painter(dim_layer);
+            dim_painter.rect_filled(screen_rect, 0.0, egui::Color32::from_black_alpha(120));
+
+            // Confirmation dialog (at Tooltip, above the Foreground dimmer)
+            egui::Window::new("Unsaved Changes")
+                .title_bar(false)
+                .collapsible(false)
+                .resizable(false)
+                .order(egui::Order::Tooltip)
+                .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+                .show(&ctx, |ui| {
+                    ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                        ui.label(format!(
+                            "\"{}\" has unsaved changes.\nDo you want to save them before closing?",
+                            file_name
+                        ));
+                    });
+
+                    ui.add_space(10.0);
+
+                    let btn_w = ui.available_width();
+                    if ui
+                        .add_sized(
+                            egui::vec2(btn_w, 0.0),
+                            egui::Button::new("Save").fill(egui::Color32::from_rgb(29, 205, 218)),
+                        )
+                        .clicked()
+                    {
+                        if self.save_tab(idx) {
+                            self.state.close_tab(idx);
+                        }
+                        self.state.pending_close_index = None;
+                    }
+
+                    if ui
+                        .add_sized(egui::vec2(btn_w, 0.0), egui::Button::new("Don't Save"))
+                        .clicked()
+                    {
+                        self.state.close_tab(idx);
+                        self.state.pending_close_index = None;
+                    }
+
+                    if ui
+                        .add_sized(egui::vec2(btn_w, 0.0), egui::Button::new("Cancel"))
+                        .clicked()
+                    {
+                        self.state.pending_close_index = None;
+                    }
+                });
         }
     }
 }

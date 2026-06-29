@@ -216,7 +216,11 @@ pub fn render_tab_strip(state: &mut AppState, ui: &mut egui::Ui) {
         state.new_tab();
     }
     if let Some(idx) = close_tab {
-        state.close_tab(idx);
+        if state.tabs[idx].is_modified() {
+            state.pending_close_index = Some(idx);
+        } else {
+            state.close_tab(idx);
+        }
     }
     if let Some(idx) = click_tab {
         state.active_tab_index = idx;
