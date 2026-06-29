@@ -69,7 +69,6 @@ pub struct AppState {
     pub was_fullscreen: bool,
     pub document_edited: bool,
 
-    /// When set, a confirmation dialog for closing a modified tab is shown.
     pub pending_close_index: Option<usize>,
 }
 

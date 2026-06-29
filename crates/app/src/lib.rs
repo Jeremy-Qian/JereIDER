@@ -190,62 +190,24 @@ impl eframe::App for JereIDEApp {
             }
         }
 
-        if let Some(idx) = self.state.pending_close_index {
-            let file_name = self.state.tabs[idx].file_name();
-            let screen_rect = ctx.viewport_rect();
+        use jereide_ui::dialog::CloseConfirmAction;
 
-            // Dim the background (at Foreground, below the Tooltip dialog)
-            let dim_layer =
-                egui::LayerId::new(egui::Order::Foreground, egui::Id::new("modal_dimmer"));
-            let dim_painter = ctx.layer_painter(dim_layer);
-            dim_painter.rect_filled(screen_rect, 0.0, egui::Color32::from_black_alpha(120));
-
-            // Confirmation dialog (at Tooltip, above the Foreground dimmer)
-            egui::Window::new("Unsaved Changes")
-                .title_bar(false)
-                .collapsible(false)
-                .resizable(false)
-                .order(egui::Order::Tooltip)
-                .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
-                .show(&ctx, |ui| {
-                    ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
-                        ui.label(format!(
-                            "\"{}\" has unsaved changes.\nDo you want to save them before closing?",
-                            file_name
-                        ));
-                    });
-
-                    ui.add_space(10.0);
-
-                    let btn_w = ui.available_width();
-                    if ui
-                        .add_sized(
-                            egui::vec2(btn_w, 0.0),
-                            egui::Button::new("Save").fill(egui::Color32::from_rgb(29, 205, 218)),
-                        )
-                        .clicked()
-                    {
-                        if self.save_tab(idx) {
-                            self.state.close_tab(idx);
-                        }
-                        self.state.pending_close_index = None;
-                    }
-
-                    if ui
-                        .add_sized(egui::vec2(btn_w, 0.0), egui::Button::new("Don't Save"))
-                        .clicked()
-                    {
+        if let Some(action) = jereide_ui::dialog::render_close_confirm_modal(&mut self.state, &ctx) {
+            match action {
+                CloseConfirmAction::Save(idx) => {
+                    if self.save_tab(idx) {
                         self.state.close_tab(idx);
-                        self.state.pending_close_index = None;
                     }
-
-                    if ui
-                        .add_sized(egui::vec2(btn_w, 0.0), egui::Button::new("Cancel"))
-                        .clicked()
-                    {
-                        self.state.pending_close_index = None;
-                    }
-                });
+                    self.state.pending_close_index = None;
+                }
+                CloseConfirmAction::Discard(idx) => {
+                    self.state.close_tab(idx);
+                    self.state.pending_close_index = None;
+                }
+                CloseConfirmAction::Cancel => {
+                    self.state.pending_close_index = None;
+                }
+            }
         }
     }
 }

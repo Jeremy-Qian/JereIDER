@@ -56,6 +56,7 @@ pub const TAB_CLOSE_STROKE: f32 = 0.9;
 pub const TAB_MODIFIED_DOT_RADIUS: f32 = 3.0;
 pub const TAB_BORDER_WIDTH: f32 = 1.0;
 pub const TAB_FONT_SIZE: f32 = 12.0;
+pub const SAVE_BUTTON_BG: Color32 = Color32::from_rgb(29, 205, 218);
 
 pub const WINDOW_WIDTH: f32 = 800.0;
 pub const WINDOW_HEIGHT: f32 = 600.0;
