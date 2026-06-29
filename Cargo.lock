@@ -12,7 +12,7 @@ dependencies = [
  "jereide-core",
  "jereide-fs",
  "jereide-menu",
- "jereide-style",
+ "jereide-settings",
  "jereide-text",
  "jereide-ui",
  "jereide-window",
@@ -1969,7 +1969,7 @@ version = "0.1.0"
 dependencies = [
  "eframe",
  "jereide-core",
- "jereide-style",
+ "jereide-settings",
  "jereide-syntax",
  "jereide-text",
 ]
@@ -1979,7 +1979,7 @@ name = "jereide-command"
 version = "0.1.0"
 dependencies = [
  "eframe",
- "jereide-style",
+ "jereide-settings",
 ]
 
 [[package]]
@@ -2005,7 +2005,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "jereide-style"
+name = "jereide-settings"
 version = "0.1.0"
 dependencies = [
  "eframe",
@@ -2016,7 +2016,7 @@ name = "jereide-syntax"
 version = "0.1.0"
 dependencies = [
  "eframe",
- "jereide-style",
+ "jereide-settings",
  "syntect",
 ]
 
@@ -2030,7 +2030,7 @@ version = "0.1.0"
 dependencies = [
  "eframe",
  "jereide-core",
- "jereide-style",
+ "jereide-settings",
 ]
 
 [[package]]
