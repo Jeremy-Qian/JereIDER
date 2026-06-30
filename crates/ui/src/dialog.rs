@@ -1,6 +1,6 @@
 use eframe::egui;
 use jereide_core::AppState;
-use jereide_settings::{ACCENT, TEXT_DEFAULT, TEXT_MUTED};
+use jereide_settings::{ACCENT, TEXT_DEFAULT, TEXT_MUTED, DIALOG_WIDTH};
 
 pub enum CloseConfirmAction {
     Save(usize),
@@ -24,6 +24,7 @@ pub fn render_close_confirm_modal(
         .title_bar(false)
         .collapsible(false)
         .resizable(false)
+        .max_width(DIALOG_WIDTH)
         .order(egui::Order::Tooltip)
         .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
         .show(ctx, |ui| {
@@ -93,6 +94,7 @@ pub fn render_large_file_blocked(ctx: &egui::Context, size: u64) -> bool {
         .title_bar(false)
         .collapsible(false)
         .resizable(false)
+        .max_width(DIALOG_WIDTH)
         .order(egui::Order::Tooltip)
         .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
         .show(ctx, |ui| {
@@ -132,6 +134,7 @@ pub fn render_large_file_warning(
         .title_bar(false)
         .collapsible(false)
         .resizable(false)
+        .max_width(DIALOG_WIDTH)
         .order(egui::Order::Tooltip)
         .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
         .show(ctx, |ui| {

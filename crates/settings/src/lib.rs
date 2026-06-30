@@ -28,3 +28,5 @@ pub const COMMAND_VIEW_FONT_SIZE: f32 = 18.0;
 
 pub const WINDOW_WIDTH: f32 = 800.0;
 pub const WINDOW_HEIGHT: f32 = 600.0;
+
+pub const DIALOG_WIDTH: f32 = 240.0;
