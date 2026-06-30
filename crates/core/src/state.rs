@@ -70,6 +70,9 @@ pub struct AppState {
     pub document_edited: bool,
 
     pub pending_close_index: Option<usize>,
+
+    pub pending_large_file_blocked: Option<u64>,
+    pub pending_large_file_warn: Option<(String, u64)>,
 }
 
 /// Another new method.
@@ -84,6 +87,8 @@ impl AppState {
             was_fullscreen: false,
             document_edited: false,
             pending_close_index: None,
+            pending_large_file_blocked: None,
+            pending_large_file_warn: None,
         }
     }
 

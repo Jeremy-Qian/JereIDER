@@ -1,6 +1,6 @@
 use eframe::egui;
 use jereide_core::AppState;
-use jereide_settings::ACCENT;
+use jereide_settings::{ACCENT, TEXT_DEFAULT, TEXT_MUTED};
 
 pub enum CloseConfirmAction {
     Save(usize),
@@ -61,6 +61,117 @@ pub fn render_close_confirm_modal(
                 .clicked()
             {
                 result = Some(CloseConfirmAction::Cancel);
+            }
+
+            result
+        });
+
+    match response {
+        Some(ir) => ir.inner.flatten(),
+        None => None,
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Large file dialogs
+// ---------------------------------------------------------------------------
+
+pub enum LargeFileAction {
+    OpenAnyway(String),
+    Cancel,
+}
+
+pub fn render_large_file_blocked(ctx: &egui::Context, size: u64) -> bool {
+    let dim_rect = ctx.viewport_rect();
+    let dim_layer = egui::LayerId::new(egui::Order::Foreground, egui::Id::new("modal_dimmer"));
+    let dim_painter = ctx.layer_painter(dim_layer);
+    dim_painter.rect_filled(dim_rect, 0.0, egui::Color32::from_black_alpha(120));
+
+    let mut dismissed = false;
+
+    egui::Window::new("File Too Large")
+        .title_bar(false)
+        .collapsible(false)
+        .resizable(false)
+        .order(egui::Order::Tooltip)
+        .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+        .show(ctx, |ui| {
+            ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                ui.colored_label(
+                    TEXT_DEFAULT,
+                    format!(
+                        "This file is {:.1} MB.",
+                        size as f64 / 1024.0 / 1024.0
+                    ),
+                );
+                ui.colored_label(TEXT_MUTED, "Files larger than 200 MB cannot be opened.");
+            });
+
+            ui.add_space(10.0);
+
+            let btn_w = ui.available_width();
+            if ui
+                .add_sized(egui::vec2(btn_w, 0.0), egui::Button::new("OK").fill(ACCENT))
+                .clicked()
+            {
+                dismissed = true;
+            }
+        });
+
+    dismissed
+}
+
+pub fn render_large_file_warning(
+    ctx: &egui::Context,
+    path: &str,
+    size: u64,
+) -> Option<LargeFileAction> {
+    let dim_rect = ctx.viewport_rect();
+    let dim_layer = egui::LayerId::new(egui::Order::Foreground, egui::Id::new("modal_dimmer"));
+    let dim_painter = ctx.layer_painter(dim_layer);
+    dim_painter.rect_filled(dim_rect, 0.0, egui::Color32::from_black_alpha(120));
+
+    let response = egui::Window::new("Large File")
+        .title_bar(false)
+        .collapsible(false)
+        .resizable(false)
+        .order(egui::Order::Tooltip)
+        .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
+        .show(ctx, |ui| {
+            ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
+                ui.colored_label(
+                    TEXT_DEFAULT,
+                    format!(
+                        "This file is {:.1} MB.",
+                        size as f64 / 1024.0 / 1024.0
+                    ),
+                );
+                ui.colored_label(
+                    TEXT_MUTED,
+                    "Opening very large files may cause performance issues.",
+                );
+            });
+
+            ui.add_space(10.0);
+
+            let btn_w = ui.available_width();
+            let mut result: Option<LargeFileAction> = None;
+
+            if ui
+                .add_sized(
+                    egui::vec2(btn_w, 0.0),
+                    egui::Button::new("Open Anyway").fill(ACCENT),
+                )
+                .clicked()
+            {
+                result = Some(LargeFileAction::OpenAnyway(path.to_string()));
+            }
+
+            if ui
+                .add_sized(egui::vec2(btn_w, 0.0), egui::Button::new("Cancel"))
+                .clicked()
+            {
+                result = Some(LargeFileAction::Cancel);
             }
 
             result

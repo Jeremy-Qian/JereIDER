@@ -10,12 +10,19 @@ impl FileManager {
         Self { current_path: None }
     }
 
-    /// Opens files dialog and then returns its path
-    pub fn open_file_dialog() -> Option<(String, PathBuf)> {
-        let file = rfd::FileDialog::new().set_title("Open File").pick_file()?;
+    /// Opens file dialog and returns the selected path
+    pub fn pick_file() -> Option<PathBuf> {
+        rfd::FileDialog::new().set_title("Open File").pick_file()
+    }
 
-        let content = std::fs::read_to_string(&file).ok()?;
-        Some((content, file))
+    /// Reads the full text content of a file
+    pub fn read_file_at(path: &PathBuf) -> Option<String> {
+        std::fs::read_to_string(path).ok()
+    }
+
+    /// Returns the file size in bytes
+    pub fn file_size(path: &PathBuf) -> Option<u64> {
+        std::fs::metadata(path).ok().map(|m| m.len())
     }
 
     /// Opens save dialog

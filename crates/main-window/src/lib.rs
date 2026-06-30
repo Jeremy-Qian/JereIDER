@@ -1,7 +1,7 @@
 use eframe::egui;
 use jereide_core::{
-    AppState, CurrentView, ITEM_SPACING_Y, TITLE_BAR_HEIGHT, TRAFFIC_LIGHT_OFFSET_X,
-    TRAFFIC_LIGHT_OFFSET_Y,
+    AppState, CurrentView, ITEM_SPACING_Y, MAX_FILE_SIZE, TITLE_BAR_HEIGHT,
+    TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y, WARN_FILE_SIZE,
 };
 use jereide_fs::FileManager;
 use jereide_menu::AppMenu;
@@ -126,11 +126,25 @@ impl JereIDEApp {
     }
 
     fn handle_open(&mut self) {
-        if let Some((content, path)) = FileManager::open_file_dialog() {
-            let path_str = path.display().to_string();
-            self.state.open_file(path_str, content);
-            self.file_manager.current_path = Some(path);
+        let Some(path) = FileManager::pick_file() else { return };
+
+        let Some(size) = FileManager::file_size(&path) else { return };
+
+        if size > MAX_FILE_SIZE {
+            self.state.pending_large_file_blocked = Some(size);
+            return;
         }
+
+        if size > WARN_FILE_SIZE {
+            self.state.pending_large_file_warn =
+                Some((path.display().to_string(), size));
+            return;
+        }
+
+        let Some(content) = FileManager::read_file_at(&path) else { return };
+        let path_str = path.display().to_string();
+        self.state.open_file(path_str, content);
+        self.file_manager.current_path = Some(path);
     }
 
     fn handle_save(&mut self) {
@@ -290,7 +304,7 @@ impl eframe::App for JereIDEApp {
             }
         }
 
-        use jereide_ui::dialog::CloseConfirmAction;
+        use jereide_ui::dialog::{CloseConfirmAction, LargeFileAction};
 
         if let Some(action) = jereide_ui::dialog::render_close_confirm_modal(&mut self.state, &ctx)
         {
@@ -307,6 +321,29 @@ impl eframe::App for JereIDEApp {
                 }
                 CloseConfirmAction::Cancel => {
                     self.state.pending_close_index = None;
+                }
+            }
+        }
+
+        if let Some(size) = self.state.pending_large_file_blocked {
+            if jereide_ui::dialog::render_large_file_blocked(&ctx, size) {
+                self.state.pending_large_file_blocked = None;
+            }
+        }
+
+        if let Some((ref path, _size)) = self.state.pending_large_file_warn.clone() {
+            let action = jereide_ui::dialog::render_large_file_warning(&ctx, path, _size);
+            if let Some(lfa) = action {
+                self.state.pending_large_file_warn = None;
+                match lfa {
+                    LargeFileAction::OpenAnyway(path_str) => {
+                        let pb = std::path::PathBuf::from(&path_str);
+                        if let Some(content) = FileManager::read_file_at(&pb) {
+                            self.state.open_file(path_str, content);
+                            self.file_manager.current_path = Some(pb);
+                        }
+                    }
+                    LargeFileAction::Cancel => {}
                 }
             }
         }
