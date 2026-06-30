@@ -20,6 +20,14 @@ pub fn render_close_confirm_modal(
     let dim_painter = ctx.layer_painter(dim_layer);
     dim_painter.rect_filled(dim_rect, 0.0, egui::Color32::from_black_alpha(120));
 
+    // No clicks outside!
+    egui::Area::new(egui::Id::new("modal_dimmer_interact"))
+            .order(egui::Order::Foreground)
+            .fixed_pos(dim_rect.min)
+            .show(ctx, |ui| {
+                ui.allocate_rect(dim_rect, egui::Sense::click());
+            });
+
     let response = egui::Window::new("Unsaved Changes")
         .title_bar(false)
         .collapsible(false)
@@ -87,6 +95,13 @@ pub fn render_large_file_blocked(ctx: &egui::Context, size: u64) -> bool {
     let dim_layer = egui::LayerId::new(egui::Order::Foreground, egui::Id::new("modal_dimmer"));
     let dim_painter = ctx.layer_painter(dim_layer);
     dim_painter.rect_filled(dim_rect, 0.0, egui::Color32::from_black_alpha(120));
+    // No clicks outside!
+    egui::Area::new(egui::Id::new("modal_dimmer_interact"))
+            .order(egui::Order::Foreground)
+            .fixed_pos(dim_rect.min)
+            .show(ctx, |ui| {
+                ui.allocate_rect(dim_rect, egui::Sense::click());
+            });
 
     let mut dismissed = false;
 
@@ -129,6 +144,14 @@ pub fn render_large_file_warning(
     let dim_layer = egui::LayerId::new(egui::Order::Foreground, egui::Id::new("modal_dimmer"));
     let dim_painter = ctx.layer_painter(dim_layer);
     dim_painter.rect_filled(dim_rect, 0.0, egui::Color32::from_black_alpha(120));
+    // No clicks outside!
+    egui::Area::new(egui::Id::new("modal_dimmer_interact"))
+            .order(egui::Order::Foreground)
+            .fixed_pos(dim_rect.min)
+            .show(ctx, |ui| {
+                ui.allocate_rect(dim_rect, egui::Sense::click());
+            });
+
 
     let response = egui::Window::new("Large File")
         .title_bar(false)
