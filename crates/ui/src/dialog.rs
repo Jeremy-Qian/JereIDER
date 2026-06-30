@@ -99,10 +99,7 @@ pub fn render_large_file_blocked(ctx: &egui::Context, size: u64) -> bool {
             ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
                 ui.colored_label(
                     TEXT_DEFAULT,
-                    format!(
-                        "This file is {:.1} MB.",
-                        size as f64 / 1024.0 / 1024.0
-                    ),
+                    format!("This file is {:.1} MB.", size as f64 / 1024.0 / 1024.0),
                 );
                 ui.colored_label(TEXT_MUTED, "Files larger than 200 MB cannot be opened.");
             });
@@ -141,10 +138,7 @@ pub fn render_large_file_warning(
             ui.with_layout(egui::Layout::top_down(egui::Align::Center), |ui| {
                 ui.colored_label(
                     TEXT_DEFAULT,
-                    format!(
-                        "This file is {:.1} MB.",
-                        size as f64 / 1024.0 / 1024.0
-                    ),
+                    format!("This file is {:.1} MB.", size as f64 / 1024.0 / 1024.0),
                 );
                 ui.colored_label(
                     TEXT_MUTED,

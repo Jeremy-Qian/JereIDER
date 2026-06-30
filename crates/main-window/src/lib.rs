@@ -1,7 +1,7 @@
 use eframe::egui;
 use jereide_core::{
-    AppState, CurrentView, ITEM_SPACING_Y, MAX_FILE_SIZE, TITLE_BAR_HEIGHT,
-    TRAFFIC_LIGHT_OFFSET_X, TRAFFIC_LIGHT_OFFSET_Y, WARN_FILE_SIZE,
+    AppState, CurrentView, ITEM_SPACING_Y, MAX_FILE_SIZE, TITLE_BAR_HEIGHT, TRAFFIC_LIGHT_OFFSET_X,
+    TRAFFIC_LIGHT_OFFSET_Y, WARN_FILE_SIZE,
 };
 use jereide_fs::FileManager;
 use jereide_menu::AppMenu;
@@ -126,9 +126,13 @@ impl JereIDEApp {
     }
 
     fn handle_open(&mut self) {
-        let Some(path) = FileManager::pick_file() else { return };
+        let Some(path) = FileManager::pick_file() else {
+            return;
+        };
 
-        let Some(size) = FileManager::file_size(&path) else { return };
+        let Some(size) = FileManager::file_size(&path) else {
+            return;
+        };
 
         if size > MAX_FILE_SIZE {
             self.state.pending_large_file_blocked = Some(size);
@@ -136,12 +140,13 @@ impl JereIDEApp {
         }
 
         if size > WARN_FILE_SIZE {
-            self.state.pending_large_file_warn =
-                Some((path.display().to_string(), size));
+            self.state.pending_large_file_warn = Some((path.display().to_string(), size));
             return;
         }
 
-        let Some(content) = FileManager::read_file_at(&path) else { return };
+        let Some(content) = FileManager::read_file_at(&path) else {
+            return;
+        };
         let path_str = path.display().to_string();
         self.state.open_file(path_str, content);
         self.file_manager.current_path = Some(path);
